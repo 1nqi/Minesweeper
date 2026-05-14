@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MineSweeper{% endblock %} | MineSweeper.com</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-background">
+            <div class="auth-bg-shape auth-bg-shape--1"></div>
+            <div class="auth-bg-shape auth-bg-shape--2"></div>
+            <div class="auth-bg-shape auth-bg-shape--3"></div>
+        </div>
+
+        <div class="auth-top-bar">
+            {% block auth_top_bar %}
+            <a href="{% url 'login' %}" class="auth-top-link">Войти</a>
+            {% endblock %}
+        </div>
+
+        <div class="auth-main">
+            {% if messages %}
+            <div class="auth-messages">
+                {% for message in messages %}
+                <div class="auth-message auth-message--{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

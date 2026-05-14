@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ profile.display_username }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-shell">
+        <!-- Header -->
+        <div class="profile-header">
+            <div class="profile-header__avatar">
+                {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="" width="96" height="96">
+                {% else %}
+                <div class="profile-header__avatar-placeholder">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                </div>
+                {% endif %}
+            </div>
+            <div class="profile-header__info">
+                <div class="profile-header__name-row">
+                    <h1 class="profile-header__name">{{ profile.display_username }}</h1>
+                    {% if profile.flair_emoji %}
+                    <span class="profile-header__flair">{{ profile.flair_emoji }}</span>
+                    {% endif %}
+                </div>
+                {% if profile.status %}
+                <p class="profile-header__status">{{ profile.status }}</p>
+                {% endif %}
+                <div class="profile-header__meta">
+                    <span>Присоединился {{ profile_user.date_joined|date:"d.m.Y" }}</span>
+                    <span>{{ profile.games_played }} игр</span>
+                    {% if profile.is_online_now %}
+                    <span class="profile-header__online">Онлайн</span>
+                    {% else %}
+                    <span class="profile-header__offline">Оффлайн</span>
+                    {% endif %}
+                </div>
+                {% if is_owner %}
+                <div class="profile-header__actions">
+                    <a href="{% url 'profiles:settings' %}" class="btn btn--dark">Редактировать профиль</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stats + Games -->
+        <div class="profile-body-grid">
+            <div class="profile-main-column">
+                <!-- Stats cards -->
+                <div class="profile-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card__value">{{ profile.games_played }}</div>
+                        <div class="stat-card__label">Игр сыграно</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__value">{{ profile.games_won }}</div>
+                        <div class="stat-card__label">Побед</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card__value">{{ profile.win_rate }}%</div>
+                        <div class="stat-card__label">Процент побед</div>
+                    </div>
+                </div>
+
+                <!-- Best times -->
+                <div class="profile-widget">
+                    <h3 class="profile-widget__title">Лучшее время</h3>
+                    <div class="best-times">
+                        <div class="best-time">
+                            <span class="best-time__label">Новичок</span>
+                            <span class="best-time__value">{% if profile.best_time_beginner %}{{ profile.best_time_beginner }}s{% else %}—{% endif %}</span>
+                        </div>
+                        <div class="best-time">
+                            <span class="best-time__label">Любитель</span>
+                            <span class="best-time__value">{% if profile.best_time_intermediate %}{{ profile.best_time_intermediate }}s{% else %}—{% endif %}</span>
+                        </div>
+                        <div class="best-time">
+                            <span class="best-time__label">Эксперт</span>
+                            <span class="best-time__value">{% if profile.best_time_expert %}{{ profile.best_time_expert }}s{% else %}—{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent games -->
+                {% if recent_games %}
+                <div class="profile-widget">
+                    <h3 class="profile-widget__title">Последние игры</h3>
+                    <table class="games-table">
+                        <thead>
+                            <tr>
+                                <th>Сложность</th>
+                                <th>Результат</th>
+                                <th>Время</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for g in recent_games %}
+                            <tr>
+                                <td>{{ g.get_difficulty_display }}</td>
+                                <td><span class="result-badge result-badge--{{ g.result }}">{{ g.get_result_display }}</span></td>
+                                <td class="mono">{{ g.time_seconds }}s</td>
+                                <td>{{ g.created_at|date:"d.m.Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-side-column">
+                {% if profile.bio %}
+                <div class="profile-widget">
+                    <h3 class="profile-widget__title">О себе</h3>
+                    <p class="profile-widget__text">{{ profile.bio }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

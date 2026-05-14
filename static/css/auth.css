@@ -1,0 +1,201 @@
+.auth-page {
+    min-height: 100vh;
+    background: var(--bg-main);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 60px;
+}
+
+.auth-background {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.auth-bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.auth-bg-shape--1 { width: 400px; height: 400px; top: -120px; right: -100px; }
+.auth-bg-shape--2 { width: 280px; height: 280px; bottom: 15%; left: -80px; }
+.auth-bg-shape--3 { width: 180px; height: 180px; top: 40%; right: 15%; }
+
+.auth-top-bar {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 24px;
+}
+
+.auth-top-link {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.auth-top-link:hover { color: var(--green-primary); }
+
+.auth-main {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-messages { width: 100%; margin-bottom: 20px; }
+
+.auth-message {
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.auth-message--error {
+    background: rgba(198, 90, 90, 0.15);
+    color: #e8a0a0;
+    border: 1px solid rgba(198, 90, 90, 0.3);
+}
+
+.auth-message--success {
+    background: rgba(115, 149, 82, 0.15);
+    color: #b8d996;
+    border: 1px solid rgba(115, 149, 82, 0.3);
+}
+
+.auth-card {
+    width: 100%;
+    background: var(--bg-panel);
+    border-radius: 14px;
+    padding: 40px 36px 36px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-soft);
+}
+
+.auth-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.auth-logo__link {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.auth-logo__accent { color: var(--green-primary); }
+
+.auth-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 24px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-input {
+    width: 100%;
+    height: 56px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    padding: 0 16px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.auth-input::placeholder { color: var(--text-muted); }
+
+.auth-input:focus {
+    outline: none;
+    border-color: rgba(115, 149, 82, 0.7);
+    box-shadow: 0 0 0 3px rgba(115, 149, 82, 0.18);
+}
+
+.auth-btn-primary {
+    width: 100%;
+    min-height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--green-primary), var(--green-dark));
+    color: #fff;
+    font-size: 1.125rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    margin-top: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.auth-btn-primary:hover {
+    background: linear-gradient(180deg, var(--green-hover), var(--green-primary));
+    transform: translateY(-1px);
+}
+
+.auth-field { margin-bottom: 4px; }
+
+.auth-errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+    font-size: 0.8125rem;
+    color: #e8a0a0;
+}
+
+.auth-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.auth-checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.auth-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--green-primary);
+}
+
+.auth-bottom-text {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+}
+
+.auth-bottom-text a {
+    color: var(--green-primary);
+    font-weight: 600;
+}
+
+.auth-bottom-text a:hover { text-decoration: underline; }

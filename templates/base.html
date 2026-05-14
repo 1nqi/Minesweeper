@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MineSweeper{% endblock %} | MineSweeper.com</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if request.user.is_authenticated %}
+        {% include "partials/sidebar_user.html" %}
+    {% else %}
+        {% include "partials/sidebar_guest.html" %}
+    {% endif %}
+
+    <div class="main-with-sidebar">
+        {% if messages %}
+        <div class="messages-bar">
+            {% for message in messages %}
+            <div class="msg msg--{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block modals %}{% endblock %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

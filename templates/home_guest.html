@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Играй в Сапёр онлайн{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-board">
+        <div class="hero-grid">
+            {% for i in "0123456789" %}
+            {% for j in "0123456789" %}
+            <div class="hero-cell {% if forloop.parentloop.counter|add:forloop.counter|divisibleby:2 %}hero-cell--dark{% endif %}"></div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="hero-content">
+        <h1 class="hero-title">Играй в Сапёр онлайн</h1>
+        <p class="hero-subtitle">Присоединяйся к игрокам со всего мира. Побей рекорды. Стань лучшим.</p>
+        <a href="{% url 'register' %}" class="btn btn--primary btn--lg">Начать игру</a>
+    </div>
+</div>
+{% endblock %}

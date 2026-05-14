@@ -1,0 +1,54 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block title %}Вход{% endblock %}
+
+{% block auth_top_bar %}
+<a href="{% url 'home' %}" class="auth-top-link">На главную</a>
+{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <div class="auth-logo">
+        <a href="{% url 'home' %}" class="auth-logo__link">Mine<span class="auth-logo__accent">Sweeper</span></a>
+    </div>
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+
+        {% if form.non_field_errors %}
+        <div class="auth-errorlist">
+            {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="auth-field">
+            {{ form.login }}
+            {% if form.login.errors %}
+            <ul class="auth-errorlist">{% for e in form.login.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="auth-field">
+            {{ form.password }}
+            {% if form.password.errors %}
+            <ul class="auth-errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div class="auth-row">
+            <label class="auth-checkbox-wrap">
+                {{ form.remember_me }}
+                Запомнить меня
+            </label>
+        </div>
+
+        <button type="submit" class="auth-btn-primary">Войти</button>
+    </form>
+
+    <p class="auth-bottom-text">
+        Впервые здесь? <a href="{% url 'register' %}">Зарегистрируйтесь</a> и начните играть!
+    </p>
+</div>
+{% endblock %}

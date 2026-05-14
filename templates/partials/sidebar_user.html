@@ -1,0 +1,34 @@
+<aside class="sidebar">
+    <div class="sidebar__logo">
+        <a href="{% url 'home' %}">Mine<span class="sidebar__logo-accent">Sweeper</span>.com</a>
+    </div>
+
+    <nav class="sidebar__nav">
+        <a href="{% url 'game:index' %}" class="sidebar__nav-item is-active">
+            <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M4 6l8 5 8-5v11H4V6z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="2" fill="currentColor"/></svg>
+            <span>Играть</span>
+        </a>
+        <a href="#" class="sidebar__nav-item">
+            <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M3 20h4v-8H3v8zm6 0h4V9H9v11zm6 0h4V4h-4v16z" fill="currentColor"/></svg>
+            <span>Рекорды</span>
+        </a>
+        <a href="{% url 'profiles:settings' %}" class="sidebar__nav-item">
+            <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Настройки</span>
+        </a>
+    </nav>
+
+    <div class="sidebar__bottom">
+        <a href="{% url 'profiles:detail' username=user.username %}" class="sidebar__user">
+            <div class="sidebar__user-avatar">
+                {% if user_profile and user_profile.avatar %}
+                <img src="{{ user_profile.avatar.url }}" class="sidebar__user-avatar--img" width="32" height="32" alt="">
+                {% else %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                {% endif %}
+            </div>
+            <span class="sidebar__user-name">{% if user_profile %}{{ user_profile.display_username }}{% else %}{{ user.username }}{% endif %}</span>
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar__logout">Выйти</a>
+    </div>
+</aside>

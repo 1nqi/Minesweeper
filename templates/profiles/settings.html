@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Настройки профиля{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="settings-shell">
+        <h1 class="settings-title">Настройки профиля</h1>
+        <p class="settings-subtitle">Редактируйте свой профиль. Всё здесь будет видно другим игрокам.</p>
+
+        <form method="post" enctype="multipart/form-data" class="settings-form">
+            {% csrf_token %}
+
+            <div class="settings-card">
+                <div class="settings-avatar-row">
+                    <div class="settings-avatar">
+                        {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="" width="80" height="80">
+                        {% else %}
+                        <div class="settings-avatar__placeholder">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="settings-avatar-upload">
+                        <label class="btn btn--dark">
+                            Изменить аватар
+                            {{ form.avatar }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-field">
+                    <label class="settings-label">Отображаемое имя</label>
+                    {{ form.display_name }}
+                </div>
+
+                <div class="settings-field">
+                    <label class="settings-label">Статус</label>
+                    {{ form.status }}
+                </div>
+
+                <div class="settings-field">
+                    <label class="settings-label">О себе</label>
+                    {{ form.bio }}
+                </div>
+
+                {{ form.flair_emoji }}
+
+                <div class="settings-field">
+                    <label class="settings-label">Flair</label>
+                    <div class="flair-picker">
+                        {% for value, label in flair_choices %}
+                        <button type="button" class="flair-option {% if profile.flair_emoji == value %}is-active{% endif %}" data-value="{{ value }}">{{ value }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn--primary">Сохранить</button>
+                <a href="{% url 'profiles:detail' username=request.user.username %}" class="btn btn--dark">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.flair-option').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.flair-option').forEach(function(b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        document.getElementById('id_flair_emoji').value = btn.getAttribute('data-value');
+    });
+});
+</script>
+{% endblock %}

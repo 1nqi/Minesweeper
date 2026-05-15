@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
@@ -21,18 +22,22 @@ def _env_list(key: str, default=None):
     return [x.strip() for x in val.split(',') if x.strip()]
 
 
+_railway_prod = os.getenv('RAILWAY_ENVIRONMENT') == 'production'
+
 SECRET_KEY = os.getenv(
     'SECRET_KEY',
     'django-insecure-ms-dev-key-change-in-production-!@#$%',
 )
 
-DEBUG = _env_bool('DEBUG', True)
+DEBUG = _env_bool('DEBUG', False if _railway_prod else True)
 
 _hosts = _env_list('ALLOWED_HOSTS')
-if not _hosts:
-    ALLOWED_HOSTS = ['*'] if DEBUG else ['localhost', '127.0.0.1']
-else:
+if _hosts:
     ALLOWED_HOSTS = _hosts
+elif DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 _csrf = _env_list('CSRF_TRUSTED_ORIGINS')
 if _csrf:
@@ -65,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,7 +104,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-if _env_bool('USE_POSTGRES', False):
+_database_url = os.getenv('DATABASE_URL', '').strip()
+
+if _database_url:
+    import dj_database_url
+
+    DATABASES = {
+        'default': dj_database_url.parse(
+            _database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=_env_bool('DATABASE_SSL_REQUIRE', not DEBUG),
+        )
+    }
+elif _env_bool('USE_POSTGRES', False):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -186,9 +205,59 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+if not DEBUG:
+    if not os.getenv('SECRET_KEY') or SECRET_KEY.startswith('django-insecure'):
+        raise ImproperlyConfigured(
+            'Set SECRET_KEY to a long random string in production (Railway Variables).'
+        )
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = _env_bool('SECURE_SSL_REDIRECT', True)
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '[{levelname}] {name}: {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': False,
+            },
+        },
+    }

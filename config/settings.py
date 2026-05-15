@@ -24,6 +24,58 @@ def _env_list(key: str, default=None):
     return [x.strip() for x in val.split(',') if x.strip()]
 
 
+def _origin_for_allowed_host(host: str) -> str | None:
+    """Собрать доверенный origin из записи ALLOWED_HOSTS (не для '*')."""
+    h = host.strip()
+    if not h or h == '*':
+        return None
+    host_part = h.split('/', 1)[0].lower()
+    if host_part.startswith('localhost') or host_part.startswith('127.0.0.1'):
+        return f'http://{h}'
+    return f'https://{h}'
+
+
+def _origins_from_allowed_hosts(hosts: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for host in hosts:
+        o = _origin_for_allowed_host(host)
+        if o and o not in seen:
+            seen.add(o)
+            out.append(o)
+    return out
+
+
+def _csrf_trusted_origins_clean(allowed_hosts: list[str]) -> list[str]:
+    """
+    Django 4+ не допускает CSRF_TRUSTED_ORIGINS=['*'].
+    '*' в CSRF_TRUSTED_ORIGINS (env) означает: добавить origin для каждого хоста из ALLOWED_HOSTS.
+    """
+    raw = _env_list('CSRF_TRUSTED_ORIGINS')
+    if not raw:
+        return []
+    out: list[str] = []
+    if '*' in raw:
+        out.extend(_origins_from_allowed_hosts(allowed_hosts))
+
+    def _append_origin(url: str) -> None:
+        if url not in out:
+            out.append(url)
+
+    for item in raw:
+        if item == '*':
+            continue
+        if item.startswith('http://') or item.startswith('https://'):
+            _append_origin(item)
+            continue
+        host_part = item.split('/', 1)[0].lower()
+        if host_part.startswith('localhost') or host_part.startswith('127.0.0.1'):
+            _append_origin(f'http://{item}')
+        else:
+            _append_origin(f'https://{item}')
+    return out
+
+
 _railway_prod = os.getenv('RAILWAY_ENVIRONMENT') == 'production'
 _collectstatic = len(sys.argv) > 1 and sys.argv[1] == 'collectstatic'
 
@@ -54,7 +106,14 @@ elif DEBUG:
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-_csrf = _env_list('CSRF_TRUSTED_ORIGINS')
+# Django 4+ не допускает CSRF_TRUSTED_ORIGINS = ['*']. True ≈ «*»: origin для каждого хоста из ALLOWED_HOSTS.
+CSRF_TRUST_ALL_ALLOWED_HOSTS = True
+
+_csrf = _csrf_trusted_origins_clean(ALLOWED_HOSTS)
+if CSRF_TRUST_ALL_ALLOWED_HOSTS:
+    for _o in _origins_from_allowed_hosts(ALLOWED_HOSTS):
+        if _o not in _csrf:
+            _csrf.append(_o)
 if _csrf:
     CSRF_TRUSTED_ORIGINS = _csrf
 

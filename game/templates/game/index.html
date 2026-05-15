@@ -60,7 +60,6 @@
 
             <div class="game-banner hidden" id="game-banner">
                 <span class="banner-text" id="banner-text"></span>
-                <button class="banner-btn" id="banner-new-game">{% trans "Новая игра" %}</button>
             </div>
 
             <div class="daily-info" id="daily-info" style="display:none">
@@ -88,11 +87,22 @@
                 <div class="theme-picker" id="theme-picker">
                     <div class="theme-swatch active" data-theme="classic" title="{% trans 'Классика' %}"></div>
                     <div class="theme-swatch" data-theme="ocean" title="{% trans 'Океан' %}"></div>
-                    <div class="theme-swatch" data-theme="desert" title="{% trans 'Пустыня' %}"></div>
-                    <div class="theme-swatch" data-theme="night" title="{% trans 'Ночь' %}"></div>
-                    <div class="theme-swatch" data-theme="candy" title="{% trans 'Конфеты' %}"></div>
+                    <div class="theme-swatch {% if not user_profile or not user_profile.is_pro %}theme-swatch--locked{% endif %}" data-theme="desert" data-pro-only="1" title="{% trans 'Пустыня' %}"></div>
+                    <div class="theme-swatch {% if not user_profile or not user_profile.is_pro %}theme-swatch--locked{% endif %}" data-theme="night" data-pro-only="1" title="{% trans 'Ночь' %}"></div>
+                    <div class="theme-swatch {% if not user_profile or not user_profile.is_pro %}theme-swatch--locked{% endif %}" data-theme="candy" data-pro-only="1" title="{% trans 'Конфеты' %}"></div>
                 </div>
             </div>
+            {% if user.is_authenticated %}
+            <div class="panel-card">
+                <h3 class="panel-title">{% trans "ИИ-подсказка" %}</h3>
+                <p class="panel-hint" style="margin:0 0 8px;font-size:0.8125rem;">{% trans "Безопасная клетка подсвечивается на поле." %}</p>
+                <div class="panel-ai-hint">
+                    <button type="button" class="btn-ai-hint" id="btn-ai-hint">{% trans "Подсказка" %}</button>
+                    <div class="ai-hint-meta" id="ai-hint-meta"></div>
+                    <p class="ai-hint-explanation" id="ai-hint-explanation" hidden></p>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -167,7 +177,22 @@ window.MS_I18N = {
     modeBlind: "{% trans 'Вслепую' %}",
     modeInfinite: "{% trans 'Бесконечный' %}",
     dailyTitle: "{% trans 'Ежедневный вызов' %}",
-    dailyDesc: "{% trans 'У всех игроков одинаковое поле. Покажи лучшее время!' %}"
+    dailyDesc: "{% trans 'У всех игроков одинаковое поле. Покажи лучшее время!' %}",
+    aiHint: "{% trans 'Подсказка' %}",
+    aiUnlimited: "{% trans 'Безлимитные подсказки (Pro).' %}",
+    aiRemaining: "{% trans 'Осталось подсказок сегодня:' %}",
+    aiLimit: "{% trans 'Лимит на сегодня исчерпан.' %}",
+    aiUpgrade: "{% trans 'Оформить Pro' %}",
+    aiLogin: "{% trans 'Войдите, чтобы использовать подсказки.' %}",
+    themeProOnly: "{% trans 'Эта тема доступна в Pro.' %}"
+};
+window.MS_GAME = {
+    isPro: {% if user_profile and user_profile.is_pro %}true{% else %}false{% endif %},
+    isAuth: {% if user.is_authenticated %}true{% else %}false{% endif %},
+    membershipUrl: "{% url 'membership:plans' %}",
+    aiStatusUrl: "{% url 'game:api_ai_status' %}",
+    aiHintUrl: "{% url 'game:api_ai_hint' %}",
+    freeThemes: ['classic', 'ocean']
 };
 </script>
 {% endblock %}

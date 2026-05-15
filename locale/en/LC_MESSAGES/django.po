@@ -581,3 +581,197 @@ msgstr "UAE"
 
 msgid "Израиль"
 msgstr "Israel"
+
+# --- Membership / Pro / billing ---
+
+msgid "Pro"
+msgstr "Pro"
+
+msgid "Назад"
+msgstr "Back"
+
+msgid "Поддержите проект и получите Pro"
+msgstr "Support the project and get Pro"
+
+msgid "Один тариф — полный доступ: режимы, темы, flair и безлимитные подсказки ИИ."
+msgstr "One plan — full access: modes, themes, flair, and unlimited AI hints."
+
+msgid "У вас активен Pro — спасибо!"
+msgstr "You have Pro active — thank you!"
+
+msgid "Free"
+msgstr "Free"
+
+msgid "Рекомендуем"
+msgstr "Recommended"
+
+msgid "Без оплаты"
+msgstr "Free forever"
+
+msgid "Ваш план уже активен."
+msgstr "Your plan is already active."
+
+msgid "Оформить Pro"
+msgstr "Get Pro"
+
+msgid "Оплата через Stripe Checkout"
+msgstr "Paid via Stripe Checkout"
+
+msgid "Укажите STRIPE_SECRET_KEY и price ID (месяц или год) в .env для оплаты."
+msgstr "Add STRIPE_SECRET_KEY and price IDs (monthly or yearly) to .env to enable checkout."
+
+msgid "Войти, чтобы оформить Pro"
+msgstr "Log in to get Pro"
+
+msgid "[Тест] Активировать Pro бесплатно"
+msgstr "[Test] Activate Pro for free"
+
+msgid "Только если в .env включён PRO_TEST_BUTTON."
+msgstr "Only if PRO_TEST_BUTTON is enabled in .env."
+
+msgid "[Тест] Отключить Pro"
+msgstr "[Test] Turn off Pro"
+
+msgid "Тест: Pro отключён."
+msgstr "Test: Pro has been turned off."
+
+msgid "Период оплаты"
+msgstr "Billing period"
+
+msgid "Ежемесячно"
+msgstr "Monthly"
+
+msgid "Ежегодно"
+msgstr "Yearly"
+
+msgid "Save 30%"
+msgstr "Save 30%"
+
+msgid "Добавьте STRIPE_PRICE_PRO_YEARLY в .env для годовой оплаты."
+msgstr "Add STRIPE_PRICE_PRO_YEARLY to .env for yearly billing."
+
+msgid "Годовой доступ после оплаты через Stripe"
+msgstr "One year of access after Stripe payment"
+
+msgid "Месячный доступ после оплаты через Stripe"
+msgstr "One month of access after Stripe payment"
+
+msgid "Upgrade to Pro"
+msgstr "Upgrade to Pro"
+
+msgid "Помощь ИИ (подсказки на поле)"
+msgstr "AI hints (safe cell on the board)"
+
+msgid "3 раза в день"
+msgstr "3 times per day"
+
+msgid "Без ограничений"
+msgstr "Unlimited"
+
+msgid "Темы доски"
+msgstr "Board themes"
+
+msgid "Классика, Океан"
+msgstr "Classic, Ocean"
+
+msgid "Все темы"
+msgstr "All themes"
+
+msgid "Flair в профиле"
+msgstr "Profile flair"
+
+msgid "Базовый набор"
+msgstr "Basic set"
+
+msgid "Весь каталог"
+msgstr "Full catalog"
+
+msgid "Игровые режимы"
+msgstr "Game modes"
+
+msgid "Только классика и скорость"
+msgstr "Classic and speed only"
+
+msgid "Все режимы: daily, blind, infinite…"
+msgstr "All modes: daily, blind, infinite…"
+
+msgid "Бейдж Pro"
+msgstr "Pro badge"
+
+msgid "—"
+msgstr "—"
+
+msgid "✓"
+msgstr "✓"
+
+msgid "Статистика и история"
+msgstr "Stats & history"
+
+msgid "Базовая"
+msgstr "Basic"
+
+msgid "Расширенная"
+msgstr "Extended"
+
+msgid "Приоритет в списках рекордов"
+msgstr "Leaderboard highlight"
+
+msgid "ИИ-подсказка"
+msgstr "AI hint"
+
+msgid "Безопасная клетка подсвечивается на поле."
+msgstr "A safe cell is highlighted on the board."
+
+msgid "Подсказка"
+msgstr "Hint"
+
+msgid "Безлимитные подсказки (Pro)."
+msgstr "Unlimited hints (Pro)."
+
+msgid "Осталось подсказок сегодня:"
+msgstr "Hints left today:"
+
+msgid "Лимит на сегодня исчерпан."
+msgstr "Daily limit reached."
+
+msgid "Только для Pro — открой подписку"
+msgstr "Pro only — view membership"
+
+msgid "Только для Pro"
+msgstr "Pro only"
+
+msgid "Войдите и оформите Pro"
+msgstr "Log in and get Pro"
+
+msgid "Оплата не настроена. Добавьте STRIPE_SECRET_KEY и price ID (STRIPE_PRICE_PRO_MONTHLY / STRIPE_PRICE_PRO или STRIPE_PRICE_PRO_YEARLY) в .env"
+msgstr "Payments not configured. Add STRIPE_SECRET_KEY and price IDs (STRIPE_PRICE_PRO_MONTHLY / STRIPE_PRICE_PRO or STRIPE_PRICE_PRO_YEARLY) to .env"
+
+msgid "Оформление оплаты недоступно. Проверьте настройки ниже."
+msgstr "Checkout is not available. See the checklist below."
+
+msgid "Оплата через Stripe Checkout (год)"
+msgstr "Paid via Stripe Checkout (yearly)"
+
+msgid "Оплата через Stripe Checkout (месяц)"
+msgstr "Paid via Stripe Checkout (monthly)"
+
+msgid "мес."
+msgstr "mo"
+
+msgid "год"
+msgstr "yr"
+
+msgid "В .env нет STRIPE_SECRET_KEY (секретный ключ, sk_test_… или sk_live_…)."
+msgstr "STRIPE_SECRET_KEY is missing in .env (secret key sk_test_… or sk_live_…)."
+
+msgid "STRIPE_SECRET_KEY должен начинаться с sk_test_ или sk_live_ (не путайте с publishable pk_…)."
+msgstr "STRIPE_SECRET_KEY must start with sk_test_ or sk_live_ (do not use the publishable pk_… key here)."
+
+msgid "Нужен Price ID месячного тарифа: STRIPE_PRICE_PRO или STRIPE_PRICE_PRO_MONTHLY (значение price_… из Stripe Dashboard)."
+msgstr "Set a monthly Price ID: STRIPE_PRICE_PRO or STRIPE_PRICE_PRO_MONTHLY (the price_… id from the Stripe Dashboard)."
+
+msgid "Price ID должен выглядеть как price_… (Product → Prices в Stripe)."
+msgstr "Price ID must look like price_… (Dashboard → Product → Prices)."
+
+msgid "Годовой STRIPE_PRICE_PRO_YEARLY должен быть price_…"
+msgstr "Yearly STRIPE_PRICE_PRO_YEARLY must be a price_… id"

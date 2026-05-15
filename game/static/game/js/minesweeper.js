@@ -25,6 +25,15 @@
     var currentTheme = localStorage.getItem('ms-theme') || 'classic';
     var blindTimers = [];
 
+    var MG = window.MS_GAME || {
+        isPro: false,
+        isAuth: false,
+        membershipUrl: '/membership/',
+        aiStatusUrl: '',
+        aiHintUrl: '',
+        freeThemes: ['classic', 'ocean']
+    };
+
     var diffLabels = {
         beginner: T.beginner || 'Beginner',
         intermediate: T.intermediate || 'Intermediate',
@@ -293,6 +302,11 @@
         clearBlindTimers();
         localTime = 0;
         timerEl.textContent = '000';
+        var explainEl = document.getElementById('ai-hint-explanation');
+        if (explainEl) {
+            explainEl.textContent = '';
+            explainEl.hidden = true;
+        }
         currentDifficulty = difficulty;
         currentMode = mode || 'classic';
         diffCurrentLabel.textContent = diffLabels[difficulty] || diffLabels.custom;
@@ -307,10 +321,6 @@
     }
 
     document.getElementById('btn-restart').addEventListener('click', function () {
-        newGame(currentDifficulty, null, null, null, currentMode);
-    });
-
-    document.getElementById('banner-new-game').addEventListener('click', function () {
         newGame(currentDifficulty, null, null, null, currentMode);
     });
 
@@ -350,13 +360,95 @@
         });
     }
 
+    function refreshAiStatus() {
+        var btnAiHint = document.getElementById('btn-ai-hint');
+        var aiHintMeta = document.getElementById('ai-hint-meta');
+        if (!btnAiHint || !MG.isAuth || !MG.aiStatusUrl) return;
+        fetch(MG.aiStatusUrl, {
+            headers: { 'X-CSRFToken': CSRF }
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            if (!aiHintMeta) return;
+            if (d.unlimited) {
+                aiHintMeta.textContent = T.aiUnlimited || '';
+                btnAiHint.disabled = false;
+            } else {
+                var left = typeof d.remaining === 'number' ? d.remaining : 0;
+                aiHintMeta.innerHTML = (T.aiRemaining || '') + ' <strong>' + left + '</strong>. <a href="' + MG.membershipUrl + '">' + (T.aiUpgrade || '') + '</a>';
+                btnAiHint.disabled = left <= 0;
+            }
+        }).catch(function () { /* ignore */ });
+    }
+
     document.querySelectorAll('.theme-swatch').forEach(function (swatch) {
         swatch.addEventListener('click', function () {
-            setTheme(swatch.getAttribute('data-theme'));
+            var theme = swatch.getAttribute('data-theme');
+            var proOnly = swatch.getAttribute('data-pro-only');
+            if (proOnly && !MG.isPro) {
+                window.location.href = MG.membershipUrl;
+                return;
+            }
+            setTheme(theme);
         });
     });
 
+    if (MG.freeThemes && MG.freeThemes.indexOf(currentTheme) === -1 && !MG.isPro) {
+        currentTheme = 'classic';
+    }
     setTheme(currentTheme);
+
+    var btnAiHint = document.getElementById('btn-ai-hint');
+    if (btnAiHint && MG.isAuth && MG.aiHintUrl) {
+        refreshAiStatus();
+        btnAiHint.addEventListener('click', function () {
+            if (!gameState || gameState.status === 'won' || gameState.status === 'lost') return;
+            fetch(MG.aiHintUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': CSRF
+                },
+                body: '{}'
+            }).then(function (r) {
+                if (r.status === 429) {
+                    return r.json().then(function (j) {
+                        var aiHintMeta = document.getElementById('ai-hint-meta');
+                        if (aiHintMeta) {
+                            aiHintMeta.innerHTML = (T.aiLimit || '') + ' <a href="' + MG.membershipUrl + '">' + (T.aiUpgrade || '') + '</a>';
+                        }
+                        btnAiHint.disabled = true;
+                        throw new Error('limit');
+                    });
+                }
+                return r.json();
+            }).then(function (data) {
+                if (data.error) return;
+                var cell = board.querySelector('.cell[data-row="' + data.row + '"][data-col="' + data.col + '"]');
+                if (cell) {
+                    cell.classList.add('cell-ai-hint-pulse');
+                    setTimeout(function () {
+                        cell.classList.remove('cell-ai-hint-pulse');
+                    }, 2200);
+                }
+                if (!data.unlimited && typeof data.remaining === 'number') {
+                    var aiHintMeta = document.getElementById('ai-hint-meta');
+                    if (aiHintMeta) {
+                        aiHintMeta.innerHTML = (T.aiRemaining || '') + ' <strong>' + data.remaining + '</strong>. <a href="' + MG.membershipUrl + '">' + (T.aiUpgrade || '') + '</a>';
+                    }
+                    btnAiHint.disabled = data.remaining <= 0;
+                }
+                var explainHint = document.getElementById('ai-hint-explanation');
+                if (explainHint) {
+                    if (data.message && String(data.message).trim()) {
+                        explainHint.textContent = data.message.trim();
+                        explainHint.hidden = false;
+                    } else {
+                        explainHint.textContent = '';
+                        explainHint.hidden = true;
+                    }
+                }
+            }).catch(function () { /* limit handled */ });
+        });
+    }
 
     function showModal(id) {
         document.getElementById(id).classList.add('active');

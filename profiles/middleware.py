@@ -13,9 +13,15 @@ class UserLanguageMiddleware:
                 profile = None
 
             if profile:
-                if profile.language:
-                    translation.activate(profile.language)
-                    request.LANGUAGE_CODE = profile.language
+                lang = (profile.language or '').strip()
+                if lang:
+                    translation.activate(lang)
+                    request.LANGUAGE_CODE = lang
+                else:
+                    sess_lang = request.session.get('django_language')
+                    if sess_lang:
+                        translation.activate(sess_lang)
+                        request.LANGUAGE_CODE = sess_lang
 
 #update status in one minute
                 now = timezone.now()

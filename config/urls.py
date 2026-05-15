@@ -6,6 +6,7 @@ from django.conf.urls.i18n import i18n_patterns
 
 from accounts.views import home_view
 from game.views_leaderboard import leaderboard as leaderboard_view
+from membership import views as membership_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,6 +15,13 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('profiles.urls')),
     path('play/', include('game.urls')),
+    # Явный маршрут до include — надёжный reverse для dev-кнопки (избегает NoReverseMatch)
+    path(
+        'membership/test-pro-off/',
+        membership_views.test_deactivate_pro,
+        name='membership_test_pro_off',
+    ),
+    path('membership/', include('membership.urls')),
     path('leaderboard/', leaderboard_view, name='leaderboard'),
     path('i18n/', include('django.conf.urls.i18n')),
 ]

@@ -28,6 +28,9 @@
                 <div class="profile-header-main">
                     <div class="profile-name-row">
                         <span class="profile-name">{{ profile.display_username }}</span>
+                        {% if profile.is_pro %}
+                        <span class="pro-badge">PRO</span>
+                        {% endif %}
 
                         {% if profile.country %}
                         <span class="flag-wrap flag-wrap--with-tooltip">
@@ -211,7 +214,7 @@
             <h4 class="flair-modal__section-title">{{ cat_name }}</h4>
             <div class="flair-modal__grid">
                 {% for emoji in cat_items %}
-                <button class="flair-modal__option {% if profile.flair_emoji == emoji %}is-selected{% endif %}" data-flair="{{ emoji }}">{{ emoji }}</button>
+                <button type="button" class="flair-modal__option {% if profile.flair_emoji == emoji %}{% if profile.is_pro or cat_name != flair_membership_label %}is-selected {% endif %}{% endif %}{% if cat_name == flair_membership_label and not profile.is_pro %}flair-modal__option--locked{% endif %}" data-flair="{{ emoji }}"{% if cat_name == flair_membership_label and not profile.is_pro %} disabled{% endif %}>{{ emoji }}</button>
                 {% endfor %}
             </div>
             {% endfor %}
@@ -256,7 +259,7 @@
             if (e.target === overlay) overlay.classList.remove('is-open');
         });
 
-        overlay.querySelectorAll('.flair-modal__option').forEach(function(btn) {
+        overlay.querySelectorAll('.flair-modal__option:not([disabled])').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var flair = btn.getAttribute('data-flair');
                 overlay.querySelectorAll('.flair-modal__option').forEach(function(b) { b.classList.remove('is-selected'); });

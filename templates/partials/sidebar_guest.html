@@ -25,33 +25,33 @@
                         <span class="sidebar__flyout-desc">{% trans "Открой все клетки как можно быстрее" %}</span>
                     </div>
                 </a>
-                <a href="{% url 'game:index' %}?mode=noflag" class="sidebar__flyout-item">
+                <a href="{% url 'membership:plans' %}" class="sidebar__flyout-item sidebar__flyout-item--locked">
                     <span class="sidebar__flyout-icon">🚫</span>
                     <div class="sidebar__flyout-text">
-                        <span class="sidebar__flyout-title">{% trans "Без флагов" %}</span>
-                        <span class="sidebar__flyout-desc">{% trans "Пройди уровень не используя флаги" %}</span>
+                        <span class="sidebar__flyout-title">{% trans "Без флагов" %} 🔒</span>
+                        <span class="sidebar__flyout-desc">{% trans "Войдите и оформите Pro" %}</span>
                     </div>
                 </a>
                 <div class="sidebar__flyout-divider"></div>
-                <a href="{% url 'game:index' %}?mode=daily" class="sidebar__flyout-item">
+                <a href="{% url 'membership:plans' %}" class="sidebar__flyout-item sidebar__flyout-item--locked">
                     <span class="sidebar__flyout-icon">📅</span>
                     <div class="sidebar__flyout-text">
-                        <span class="sidebar__flyout-title">{% trans "Ежедневный вызов" %}</span>
-                        <span class="sidebar__flyout-desc">{% trans "Одно поле в день — сравни результат с другими" %}</span>
+                        <span class="sidebar__flyout-title">{% trans "Ежедневный вызов" %} 🔒</span>
+                        <span class="sidebar__flyout-desc">{% trans "Войдите и оформите Pro" %}</span>
                     </div>
                 </a>
-                <a href="{% url 'game:index' %}?mode=blind" class="sidebar__flyout-item">
+                <a href="{% url 'membership:plans' %}" class="sidebar__flyout-item sidebar__flyout-item--locked">
                     <span class="sidebar__flyout-icon">🙈</span>
                     <div class="sidebar__flyout-text">
-                        <span class="sidebar__flyout-title">{% trans "Вслепую" %}</span>
-                        <span class="sidebar__flyout-desc">{% trans "Числа исчезают через 2 секунды — запоминай!" %}</span>
+                        <span class="sidebar__flyout-title">{% trans "Вслепую" %} 🔒</span>
+                        <span class="sidebar__flyout-desc">{% trans "Войдите и оформите Pro" %}</span>
                     </div>
                 </a>
-                <a href="{% url 'game:index' %}?mode=infinite" class="sidebar__flyout-item">
+                <a href="{% url 'membership:plans' %}" class="sidebar__flyout-item sidebar__flyout-item--locked">
                     <span class="sidebar__flyout-icon">♾️</span>
                     <div class="sidebar__flyout-text">
-                        <span class="sidebar__flyout-title">{% trans "Бесконечный" %}</span>
-                        <span class="sidebar__flyout-desc">{% trans "Поле расширяется — играй пока не проиграешь" %}</span>
+                        <span class="sidebar__flyout-title">{% trans "Бесконечный" %} 🔒</span>
+                        <span class="sidebar__flyout-desc">{% trans "Войдите и оформите Pro" %}</span>
                     </div>
                 </a>
             </div>
@@ -59,6 +59,10 @@
         <a href="{% url 'leaderboard' %}" class="sidebar__nav-item">
             <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M3 20h4v-8H3v8zm6 0h4V9H9v11zm6 0h4V4h-4v16z" fill="currentColor"/></svg>
             <span>{% trans "Рекорды" %}</span>
+        </a>
+        <a href="{% url 'membership:plans' %}" class="sidebar__nav-item sidebar__nav-item--upgrade">
+            <span class="sidebar__nav-icon" aria-hidden="true">💎</span>
+            <span>{% trans "Upgrade to Pro" %}</span>
         </a>
     </nav>
 

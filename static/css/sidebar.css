@@ -56,6 +56,23 @@
     background: rgba(115, 149, 82, 0.08);
 }
 
+.sidebar__nav-item--upgrade {
+    color: #8ec5ff;
+}
+
+.sidebar__nav-item--upgrade:hover {
+    color: #b8d8ff;
+    background: rgba(56, 139, 253, 0.1);
+}
+
+.sidebar__flyout-item--locked {
+    opacity: 0.85;
+}
+
+.sidebar__flyout-item--locked .sidebar__flyout-title {
+    color: #c9c2b8;
+}
+
 .sidebar__nav-icon {
     width: 24px;
     height: 24px;

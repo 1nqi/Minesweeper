@@ -581,3 +581,197 @@ msgstr "БАӘ"
 
 msgid "Израиль"
 msgstr "Израиль"
+
+# --- Membership / Pro / billing ---
+
+msgid "Pro"
+msgstr "Pro"
+
+msgid "Назад"
+msgstr "Артқа"
+
+msgid "Поддержите проект и получите Pro"
+msgstr "Жобаны қолдап, Pro алыңыз"
+
+msgid "Один тариф — полный доступ: режимы, темы, flair и безлимитные подсказки ИИ."
+msgstr "Бір тариф — толық қолжетімділік: режимдер, темалар, flair және шектелмеген ИИ кеңестері."
+
+msgid "У вас активен Pro — спасибо!"
+msgstr "Сізде Pro белсенді — рақмет!"
+
+msgid "Free"
+msgstr "Тегін"
+
+msgid "Рекомендуем"
+msgstr "Ұсынамыз"
+
+msgid "Без оплаты"
+msgstr "Төлемсіз"
+
+msgid "Ваш план уже активен."
+msgstr "Жоспарыңыз қазірдің өзінде белсенді."
+
+msgid "Оформить Pro"
+msgstr "Pro рәсімдеу"
+
+msgid "Оплата через Stripe Checkout"
+msgstr "Stripe Checkout арқылы төлем"
+
+msgid "Укажите STRIPE_SECRET_KEY и price ID (месяц или год) в .env для оплаты."
+msgstr "Төлем үшін .env ішіне STRIPE_SECRET_KEY және price ID (ай немесе жыл) енгізіңіз."
+
+msgid "Войти, чтобы оформить Pro"
+msgstr "Pro алу үшін кіріңіз"
+
+msgid "[Тест] Активировать Pro бесплатно"
+msgstr "[Тест] Pro тегін белсендіру"
+
+msgid "Только если в .env включён PRO_TEST_BUTTON."
+msgstr "Тек .env ішінде PRO_TEST_BUTTON қосулы болса."
+
+msgid "[Тест] Отключить Pro"
+msgstr "[Тест] Pro өшіру"
+
+msgid "Тест: Pro отключён."
+msgstr "Тест: Pro өшірілді."
+
+msgid "Период оплаты"
+msgstr "Төлем мерзімі"
+
+msgid "Ежемесячно"
+msgstr "Ай сайын"
+
+msgid "Ежегодно"
+msgstr "Жыл сайын"
+
+msgid "Save 30%"
+msgstr "30% үнемдеу"
+
+msgid "Добавьте STRIPE_PRICE_PRO_YEARLY в .env для годовой оплаты."
+msgstr "Жылдық төлем үшін .env ішіне STRIPE_PRICE_PRO_YEARLY енгізіңіз."
+
+msgid "Годовой доступ после оплаты через Stripe"
+msgstr "Stripe төлемінен кейін жылдық қолжетімділік"
+
+msgid "Месячный доступ после оплаты через Stripe"
+msgstr "Stripe төлемінен кейін айлық қолжетімділік"
+
+msgid "Upgrade to Pro"
+msgstr "Pro-ға жаңарту"
+
+msgid "Помощь ИИ (подсказки на поле)"
+msgstr "ИИ көмегі (өрістегі қауіпсіз ұяшық)"
+
+msgid "3 раза в день"
+msgstr "Күніне 3 рет"
+
+msgid "Без ограничений"
+msgstr "Шектеусіз"
+
+msgid "Темы доски"
+msgstr "Тақта темалары"
+
+msgid "Классика, Океан"
+msgstr "Классика, Мұхит"
+
+msgid "Все темы"
+msgstr "Барлық темалар"
+
+msgid "Flair в профиле"
+msgstr "Профильдегі flair"
+
+msgid "Базовый набор"
+msgstr "Негізгі жиынтық"
+
+msgid "Весь каталог"
+msgstr "Толық каталог"
+
+msgid "Игровые режимы"
+msgstr "Ойын режимдері"
+
+msgid "Только классика и скорость"
+msgstr "Тек классика және жылдамдық"
+
+msgid "Все режимы: daily, blind, infinite…"
+msgstr "Барлық режимдер: daily, blind, infinite…"
+
+msgid "Бейдж Pro"
+msgstr "Pro белгісі"
+
+msgid "—"
+msgstr "—"
+
+msgid "✓"
+msgstr "✓"
+
+msgid "Статистика и история"
+msgstr "Статистика және тарих"
+
+msgid "Базовая"
+msgstr "Негізгі"
+
+msgid "Расширенная"
+msgstr "Кеңейтілген"
+
+msgid "Приоритет в списках рекордов"
+msgstr "Рекордтар тізімінде басымдық"
+
+msgid "ИИ-подсказка"
+msgstr "ИИ кеңестігі"
+
+msgid "Безопасная клетка подсвечивается на поле."
+msgstr "Қауіпсіз ұяшық өрісте бөлек көрсетіледі."
+
+msgid "Подсказка"
+msgstr "Кеңес"
+
+msgid "Безлимитные подсказки (Pro)."
+msgstr "Шектеусіз кеңестер (Pro)."
+
+msgid "Осталось подсказок сегодня:"
+msgstr "Бүгін қалған кеңестер:"
+
+msgid "Лимит на сегодня исчерпан."
+msgstr "Бүгінгі лимит таусылды."
+
+msgid "Только для Pro — открой подписку"
+msgstr "Тек Pro үшін — жазылымды ашыңыз"
+
+msgid "Только для Pro"
+msgstr "Тек Pro үшін"
+
+msgid "Войдите и оформите Pro"
+msgstr "Кіріп, Pro рәсімдеңіз"
+
+msgid "Оплата не настроена. Добавьте STRIPE_SECRET_KEY и price ID (STRIPE_PRICE_PRO_MONTHLY / STRIPE_PRICE_PRO или STRIPE_PRICE_PRO_YEARLY) в .env"
+msgstr "Төлем бапапталмаған. .env ішіне STRIPE_SECRET_KEY және price ID (STRIPE_PRICE_PRO_MONTHLY / STRIPE_PRICE_PRO немесе STRIPE_PRICE_PRO_YEARLY) енгізіңіз"
+
+msgid "Оформление оплаты недоступно. Проверьте настройки ниже."
+msgstr "Төлем рәсімдеу қолжетімсіз. Төмендегі тізімді тексеріңіз."
+
+msgid "Оплата через Stripe Checkout (год)"
+msgstr "Stripe Checkout арқылы төлем (жыл)"
+
+msgid "Оплата через Stripe Checkout (месяц)"
+msgstr "Stripe Checkout арқылы төлем (ай)"
+
+msgid "мес."
+msgstr "ай"
+
+msgid "год"
+msgstr "жыл"
+
+msgid "В .env нет STRIPE_SECRET_KEY (секретный ключ, sk_test_… или sk_live_…)."
+msgstr ".env ішінде STRIPE_SECRET_KEY жоқ (құпия кілт sk_test_… немесе sk_live_…)."
+
+msgid "STRIPE_SECRET_KEY должен начинаться с sk_test_ или sk_live_ (не путайте с publishable pk_…)."
+msgstr "STRIPE_SECRET_KEY sk_test_ немесе sk_live_ деп басталуы керек (pk_… жария кілтімен шатастырмаңыз)."
+
+msgid "Нужен Price ID месячного тарифа: STRIPE_PRICE_PRO или STRIPE_PRICE_PRO_MONTHLY (значение price_… из Stripe Dashboard)."
+msgstr "Айлық тарифтың Price ID қажет: STRIPE_PRICE_PRO немесе STRIPE_PRICE_PRO_MONTHLY (Stripe Dashboard-тегі price_…)."
+
+msgid "Price ID должен выглядеть как price_… (Product → Prices в Stripe)."
+msgstr "Price ID price_… түрінде болуы керек (Stripe → Product → Prices)."
+
+msgid "Годовой STRIPE_PRICE_PRO_YEARLY должен быть price_…"
+msgstr "Жылдық STRIPE_PRICE_PRO_YEARLY да price_… болуы тиіс"

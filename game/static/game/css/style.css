@@ -355,6 +355,73 @@
 .theme-swatch[data-theme="candy"]::before { background: #f48fb1; }
 .theme-swatch[data-theme="candy"]::after { background: #ec82a5; }
 
+.theme-swatch--locked {
+    opacity: 0.55;
+    filter: grayscale(0.35);
+}
+
+.theme-swatch--locked:hover {
+    transform: none;
+}
+
+.panel-ai-hint {
+    margin-top: 12px;
+}
+
+.btn-ai-hint {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(56, 139, 253, 0.15);
+    color: #8ec5ff;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-ai-hint:hover:not(:disabled) {
+    background: rgba(56, 139, 253, 0.28);
+}
+
+.btn-ai-hint:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.ai-hint-meta {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted, #8a8278);
+    line-height: 1.4;
+}
+
+.ai-hint-meta a {
+    color: #8ec5ff;
+}
+
+.ai-hint-explanation {
+    margin: 8px 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: #c9c2b8;
+}
+
+.ai-hint-explanation[hidden] {
+    display: none !important;
+}
+
+.cell-ai-hint-pulse {
+    box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.85);
+    animation: ai-hint-pulse 0.9s ease-out 2;
+}
+
+@keyframes ai-hint-pulse {
+    from { box-shadow: 0 0 0 0 rgba(56, 139, 253, 0.6); }
+    to { box-shadow: 0 0 0 10px rgba(56, 139, 253, 0); }
+}
+
 .game-banner {
     display: flex;
     align-items: center;

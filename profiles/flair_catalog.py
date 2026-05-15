@@ -1,0 +1,23 @@
+FLAIR_MEMBERSHIP_LABEL = 'Membership'
+
+_FLAIR_MEMBERSHIP = (
+    '💎', '🔷', '🔮', '❤️', '🔶', '💗', '🩶', '🪩',
+    '👑', '👸', '🤴', '💛', '🧡', '❤️‍🔥', '🖤', '💜',
+    '⭐', '🌟', '✨', '💫', '🌠', '⚜️', '🏅', '🎖️',
+)
+_FLAIR_EMOJI = (
+    '😀', '😎', '🤩', '😏', '🙂', '😃', '😁', '😬',
+    '🤓', '😡', '😤', '😢', '💀', '🤑', '😂', '🤭',
+    '🥳', '🫡', '👏', '🤝', '🙌', '😇', '🥶', '🫠',
+)
+
+_FLAIR_MINESWEEPER = (
+    '💣', '🚩', '🏆', '🔥', '⚡', '🎯', '🧠', '🗺️',
+    '💥', '🛡️', '⏱️', '🎰', '🧨', '🪖', '🏴‍☠️', '🔍',
+)
+FLAIR_CATEGORIES = [
+    (FLAIR_MEMBERSHIP_LABEL, _FLAIR_MEMBERSHIP),
+    ('Emoji', _FLAIR_EMOJI),
+    ('Minesweeper', _FLAIR_MINESWEEPER),
+]
+FLAIR_EMOJIS_PRO_ONLY = frozenset(_FLAIR_MEMBERSHIP)

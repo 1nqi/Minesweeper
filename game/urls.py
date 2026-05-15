@@ -11,4 +11,6 @@ urlpatterns = [
     path('api/state/', views.api_state, name='api_state'),
     path('api/save/', views.api_save_result, name='api_save'),
     path('api/leaderboard/', views.api_leaderboard, name='api_leaderboard'),
+    path('api/ai-status/', views.api_ai_status, name='api_ai_status'),
+    path('api/hint/', views.api_ai_hint, name='api_ai_hint'),
 ]

@@ -33,17 +33,17 @@ class UserProfile(models.Model):
     best_time_intermediate = models.FloatField(null=True, blank=True)
     best_time_expert = models.FloatField(null=True, blank=True)
 
-    # Pro membership
     PRO_TIERS = [
         ('', 'Free'),
-        ('gold', 'Gold'),
-        ('platinum', 'Platinum'),
-        ('diamond', 'Diamond'),
+        ('pro', 'Pro'),
     ]
     pro_tier = models.CharField(max_length=16, blank=True, default='', choices=PRO_TIERS)
     pro_until = models.DateTimeField(blank=True, null=True)
     pro_started_at = models.DateTimeField(blank=True, null=True)
     stripe_customer_id = models.CharField(max_length=64, blank=True)
+
+    ai_assist_date = models.DateField(blank=True, null=True)
+    ai_assist_count = models.PositiveSmallIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -76,7 +76,7 @@ class UserProfile(models.Model):
 
     @property
     def is_pro(self):
-        if not self.pro_tier:
+        if self.pro_tier != 'pro':
             return False
         if self.pro_until and self.pro_until < timezone.now():
             return False

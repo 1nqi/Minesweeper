@@ -113,7 +113,7 @@
                             <h4 class="flair-section__category">{{ cat_name }}</h4>
                             <div class="flair-grid">
                                 {% for emoji in cat_items %}
-                                <button type="button" class="flair-option {% if profile.flair_emoji == emoji %}is-selected{% endif %}" data-value="{{ emoji }}">{{ emoji }}</button>
+                                <button type="button" class="flair-option {% if profile.flair_emoji == emoji %}{% if profile.is_pro or cat_name != flair_membership_label %}is-selected {% endif %}{% endif %}{% if cat_name == flair_membership_label and not profile.is_pro %}flair-option--locked{% endif %}" data-value="{{ emoji }}"{% if cat_name == flair_membership_label and not profile.is_pro %} disabled{% endif %}>{{ emoji }}</button>
                                 {% endfor %}
                             </div>
                             {% endfor %}
@@ -191,7 +191,7 @@
     var flairInput = document.getElementById('id_flair_emoji');
     var flairPreview = document.getElementById('flair-preview');
 
-    document.querySelectorAll('.flair-option').forEach(function(btn) {
+    document.querySelectorAll('.flair-option:not([disabled])').forEach(function(btn) {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.flair-option').forEach(function(b) { b.classList.remove('is-selected'); });
             btn.classList.add('is-selected');

@@ -71,11 +71,18 @@
     gap: 10px;
 }
 
-.profile-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #f2f2f1;
-    line-height: 1.2;
+.pro-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, #388bfd, #1f6feb);
+    color: #fff;
+    vertical-align: middle;
 }
 .tt {
     position: absolute;
@@ -581,6 +588,20 @@
 }
 .flair-modal__option:hover { background: #35312d; transform: scale(1.05); }
 .flair-modal__option.is-selected { border-color: #7fa650; background: rgba(127,166,80,0.12); }
+
+.flair-modal__option.flair-modal__option--locked,
+.flair-modal__option:disabled {
+    opacity: 0.32;
+    filter: grayscale(1);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.flair-modal__option.flair-modal__option--locked:hover,
+.flair-modal__option:disabled:hover {
+    background: #2c2926;
+    transform: none;
+}
 
 
 @media (max-width: 1100px) {

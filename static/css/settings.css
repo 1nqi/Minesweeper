@@ -388,6 +388,20 @@
     background: rgba(127,166,80,0.12);
 }
 
+.flair-option.flair-option--locked,
+.flair-option:disabled {
+    opacity: 0.32;
+    filter: grayscale(1);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.flair-option.flair-option--locked:hover,
+.flair-option:disabled:hover {
+    background: #2c2926;
+    transform: none;
+}
+
 /* ===== Account section ===== */
 
 .account-info {

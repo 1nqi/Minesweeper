@@ -11,6 +11,8 @@ from django.views.decorators.http import require_http_methods, require_POST
 
 from .models import UserProfile
 from .forms import ProfileForm, FLAIR_EMOJI_CHOICES, FLAIR_CATEGORIES
+from .flair_catalog import FLAIR_MEMBERSHIP_LABEL
+from .pro import flair_allowed_for_user
 from game.models import GameResult
 
 User = get_user_model()
@@ -42,6 +44,7 @@ def profile_detail(request, username):
         'is_owner': is_owner,
         'flair_choices': flair_choices,
         'flair_categories': FLAIR_CATEGORIES,
+        'flair_membership_label': FLAIR_MEMBERSHIP_LABEL,
         'active_tab': active_tab,
         'losses': losses,
     })
@@ -56,7 +59,6 @@ def profile_settings(request):
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            # сразу применяем новый язык
             if profile.language:
                 translation.activate(profile.language)
                 request.session['django_language'] = profile.language
@@ -72,6 +74,7 @@ def profile_settings(request):
         'form': form,
         'flair_choices': flair_choices,
         'flair_categories': FLAIR_CATEGORIES,
+        'flair_membership_label': FLAIR_MEMBERSHIP_LABEL,
     })
 
 
@@ -83,6 +86,8 @@ def api_update_flair(request):
     if flair not in ALLOWED_FLAIRS:
         flair = ''
     profile, _created = UserProfile.objects.get_or_create(user=request.user)
+    if flair and not flair_allowed_for_user(flair, profile.is_pro):
+        flair = ''
     profile.flair_emoji = flair
     profile.save(update_fields=['flair_emoji'])
     return JsonResponse({'ok': True, 'flair': flair})

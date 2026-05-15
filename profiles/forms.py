@@ -2,23 +2,8 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import UserProfile
 from .countries import COUNTRY_CHOICES
-
-FLAIR_CATEGORIES = [
-    ('Membership', [
-        '💎', '🔷', '🔮', '❤️', '🔶', '💗', '🩶', '🪩',
-        '👑', '👸', '🤴', '💛', '🧡', '❤️‍🔥', '🖤', '💜',
-        '⭐', '🌟', '✨', '💫', '🌠', '⚜️', '🏅', '🎖️',
-    ]),
-    ('Emoji', [
-        '😀', '😎', '🤩', '😏', '🙂', '😃', '😁', '😬',
-        '🤓', '😡', '😤', '😢', '💀', '🤑', '😂', '🤭',
-        '🥳', '🫡', '👏', '🤝', '🙌', '😇', '🥶', '🫠',
-    ]),
-    ('Minesweeper', [
-        '💣', '🚩', '🏆', '🔥', '⚡', '🎯', '🧠', '🗺️',
-        '💥', '🛡️', '⏱️', '🎰', '🧨', '🪖', '🏴‍☠️', '🔍',
-    ]),
-]
+from .flair_catalog import FLAIR_CATEGORIES
+from .pro import flair_allowed_for_user
 
 FLAIR_EMOJI_CHOICES = [('', 'Нет')]
 for _cat, _items in FLAIR_CATEGORIES:
@@ -64,3 +49,10 @@ class ProfileForm(forms.ModelForm):
         if avatar and hasattr(avatar, 'size') and avatar.size > 5 * 1024 * 1024:
             raise forms.ValidationError(_('Изображение должно быть меньше 5 МБ.'))
         return avatar
+
+    def clean_flair_emoji(self):
+        flair = self.cleaned_data.get('flair_emoji') or ''
+        is_pro = self.instance.is_pro if self.instance.pk else False
+        if flair and not flair_allowed_for_user(flair, is_pro):
+            return ''
+        return flair

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'accounts',
     'profiles',
     'game',
+    'membership',
 ]
 
 MIDDLEWARE = [
@@ -142,10 +143,21 @@ LOGIN_REDIRECT_URL = '/'
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID', '')
 GOOGLE_OAUTH_SECRET = os.getenv('GOOGLE_OAUTH_SECRET', '')
 
-STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', '')
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
-STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', '').strip()
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '').strip()
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '').strip()
+# Совместимость: STRIPE_PRICE_PRO = месячный price, если не задан STRIPE_PRICE_PRO_MONTHLY
+STRIPE_PRICE_PRO = os.getenv('STRIPE_PRICE_PRO', '').strip()
+STRIPE_PRICE_PRO_MONTHLY = (
+    os.getenv('STRIPE_PRICE_PRO_MONTHLY', '').strip() or STRIPE_PRICE_PRO
+)
+STRIPE_PRICE_PRO_YEARLY = os.getenv('STRIPE_PRICE_PRO_YEARLY', '').strip()
 PRO_TEST_BUTTON = _env_bool('PRO_TEST_BUTTON', DEBUG)
+
+# Google Gemini — текст к ИИ-подсказке (координаты считаются на сервере, см. game.views)
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '').strip()
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.0-flash').strip()
+GEMINI_HINT_EXPLAIN = _env_bool('GEMINI_HINT_EXPLAIN', True)
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Pro" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/membership.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="membership-page">
+    <header class="membership-hero">
+        <a class="membership-back" href="{% url 'home' %}">← {% trans "Назад" %}</a>
+        <h1 class="membership-title">{% trans "Поддержите проект и получите Pro" %}</h1>
+        <p class="membership-sub">{% trans "Один тариф — полный доступ: режимы, темы, flair и безлимитные подсказки ИИ." %}</p>
+        {% if is_pro %}
+        <p class="membership-status membership-status--ok">{% trans "У вас активен Pro — спасибо!" %}</p>
+        {% endif %}
+    </header>
+
+    <div class="membership-shell">
+        {% if not is_pro %}
+        <div class="membership-billing" id="membership-billing"
+             role="group"
+             aria-label="{% trans 'Период оплаты' %}"
+             data-checkout-url="{% url 'membership:checkout' %}"
+             data-yearly-available="{% if yearly_available %}1{% else %}0{% endif %}"
+             data-note-monthly="{% filter escapejs %}{% trans "Оплата через Stripe Checkout (месяц)" %}{% endfilter %}"
+             data-note-yearly="{% filter escapejs %}{% trans "Оплата через Stripe Checkout (год)" %}{% endfilter %}"
+             data-price-monthly="{% filter escapejs %}{{ price_monthly_display|default:'' }}{% endfilter %}"
+             data-price-yearly="{% filter escapejs %}{{ price_yearly_footer_display|default:'' }}{% endfilter %}"
+             data-initial-billing="{{ billing_period }}">
+            <button type="button" class="membership-billing__opt {% if billing_period == 'monthly' %}is-active{% endif %}" data-billing="monthly" aria-pressed="{% if billing_period == 'monthly' %}true{% else %}false{% endif %}">
+                <span class="membership-billing__label">{% trans "Ежемесячно" %}</span>
+                {% if price_monthly_display %}<span class="membership-billing__price">{{ price_monthly_display }}</span>{% endif %}
+            </button>
+            {% if yearly_available %}
+            <button type="button" class="membership-billing__opt {% if billing_period == 'yearly' %}is-active{% endif %}" data-billing="yearly" aria-pressed="{% if billing_period == 'yearly' %}true{% else %}false{% endif %}">
+                <span class="membership-billing__row">
+                    <span class="membership-billing__label">{% trans "Ежегодно" %}</span>
+                    <span class="membership-billing__save">{% trans "Save 30%" %}</span>
+                </span>
+                {% if price_yearly_toggle_display %}<span class="membership-billing__price">{{ price_yearly_toggle_display }}</span>{% endif %}
+            </button>
+            {% else %}
+            <span class="membership-billing__opt membership-billing__opt--na" title="{% trans 'Добавьте STRIPE_PRICE_PRO_YEARLY в .env для годовой оплаты.' %}">
+                <span class="membership-billing__label">{% trans "Ежегодно" %}</span>
+                <span class="membership-billing__save">{% trans "Save 30%" %}</span>
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="membership-table-wrap">
+            <table class="membership-table" role="table">
+                <colgroup>
+                    <col class="membership-col-feature">
+                    <col class="membership-col-free">
+                    <col class="membership-col-pro">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th scope="col" class="membership-th membership-th--feature"></th>
+                        <th scope="col" class="membership-th membership-th--free">
+                            <div class="membership-th-inner">
+                                <span class="membership-popular-badge membership-th-badge-spacer" aria-hidden="true">{% trans "Рекомендуем" %}</span>
+                                <span class="membership-tier-icon" aria-hidden="true">🎁</span>
+                                <span class="membership-tier-name">{% trans "Free" %}</span>
+                            </div>
+                        </th>
+                        <th scope="col" class="membership-th membership-th--pro">
+                            <div class="membership-th-inner">
+                                <span class="membership-popular-badge">{% trans "Рекомендуем" %}</span>
+                                <span class="membership-tier-icon membership-tier-icon--pro" aria-hidden="true">💎</span>
+                                <span class="membership-tier-name">{% trans "Pro" %}</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in comparison %}
+                    <tr>
+                        <th scope="row" class="membership-td membership-td--feature">
+                            <span class="membership-row-icon" aria-hidden="true">{{ row.icon }}</span>
+                            <span class="membership-row-label">{{ row.label }}</span>
+                        </th>
+                        <td class="membership-td membership-td--free">{{ row.free }}</td>
+                        <td class="membership-td membership-td--pro"><span class="membership-cell-text--pro">{{ row.pro }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="membership-tf membership-tf--feature"></td>
+                        <td class="membership-tf membership-tf--free">
+                            <span class="membership-price-note">{% trans "Без оплаты" %}</span>
+                        </td>
+                        <td class="membership-tf membership-tf--pro">
+                            {% if is_pro %}
+                            <span class="membership-cta-note">{% trans "Ваш план уже активен." %}</span>
+                            {% elif user.is_authenticated %}
+                                {% if stripe_configured %}
+                                <a id="membership-checkout-cta" class="membership-cta membership-cta--primary" href="{% url 'membership:checkout' %}?billing={{ billing_period }}">{% trans "Оформить Pro" %}</a>
+                                <span id="membership-selected-price" class="membership-price-amount"{% if not selected_price_display %} hidden{% endif %}>{% if selected_price_display %}{{ selected_price_display }}{% endif %}</span>
+                                <span id="membership-checkout-note" class="membership-price-note">
+                                    {% if billing_period == 'yearly' %}
+                                    {% trans "Оплата через Stripe Checkout (год)" %}
+                                    {% else %}
+                                    {% trans "Оплата через Stripe Checkout (месяц)" %}
+                                    {% endif %}
+                                </span>
+                                {% else %}
+                                <p class="membership-warn">{% trans "Оформление оплаты недоступно. Проверьте настройки ниже." %}</p>
+                                {% if stripe_setup_issues %}
+                                <ul class="membership-warn-list">
+                                    {% for line in stripe_setup_issues %}
+                                    <li>{{ line }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                                {% endif %}
+                            {% else %}
+                            <a class="membership-cta membership-cta--primary" href="{% url 'login' %}?next=/membership/">{% trans "Войти, чтобы оформить Pro" %}</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        {% if show_test_button and user.is_authenticated %}
+        <div class="membership-dev">
+            {% if not is_pro %}
+            <form action="{% url 'membership:test_pro' %}" method="post" class="membership-dev-form">
+                {% csrf_token %}
+                <button type="submit" class="membership-dev-btn">{% trans "[Тест] Активировать Pro бесплатно" %}</button>
+            </form>
+            {% endif %}
+            {% if is_pro %}
+            <form action="{% url 'membership_test_pro_off' %}" method="post" class="membership-dev-form">
+                {% csrf_token %}
+                <button type="submit" class="membership-dev-btn membership-dev-btn--danger">{% trans "[Тест] Отключить Pro" %}</button>
+            </form>
+            {% endif %}
+            <p class="membership-dev-hint">{% trans "Только если в .env включён PRO_TEST_BUTTON." %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var root = document.getElementById('membership-billing');
+    if (!root) return;
+
+    var checkoutBase = root.dataset.checkoutUrl || '';
+    var yearlyOk = root.dataset.yearlyAvailable === '1';
+    var noteMo = root.dataset.noteMonthly || '';
+    var noteYr = root.dataset.noteYearly || '';
+    var priceMo = root.dataset.priceMonthly || '';
+    var priceYr = root.dataset.priceYearly || '';
+    var period = root.dataset.initialBilling || 'monthly';
+
+    var cta = document.getElementById('membership-checkout-cta');
+    var footPrice = document.getElementById('membership-selected-price');
+    var footNote = document.getElementById('membership-checkout-note');
+
+    function setBilling(next) {
+        if ((next === 'yearly' && !yearlyOk) || (next !== 'monthly' && next !== 'yearly')) {
+            next = 'monthly';
+        }
+        period = next;
+
+        root.querySelectorAll('button[data-billing]').forEach(function (btn) {
+            var on = btn.getAttribute('data-billing') === period;
+            btn.classList.toggle('is-active', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+
+        if (cta) {
+            cta.setAttribute('href', checkoutBase + '?billing=' + encodeURIComponent(period));
+        }
+        if (footPrice) {
+            var p = period === 'yearly' ? priceYr : priceMo;
+            if (p) {
+                footPrice.textContent = p;
+                footPrice.hidden = false;
+            } else {
+                footPrice.textContent = '';
+                footPrice.hidden = true;
+            }
+        }
+        if (footNote) {
+            footNote.textContent = period === 'yearly' ? noteYr : noteMo;
+        }
+
+        var path = window.location.pathname + (period === 'monthly' ? '' : '?billing=' + period);
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({ billing: period }, '', path);
+        }
+    }
+
+    root.querySelectorAll('button[data-billing]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            setBilling(btn.getAttribute('data-billing') || 'monthly');
+        });
+    });
+
+    setBilling(period);
+})();
+</script>
+{% endblock %}

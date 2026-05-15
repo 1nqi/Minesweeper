@@ -6,6 +6,7 @@
 - [Скриншот](#скриншот)
 - [Что сделано, для кого и зачем](#что-сделано-для-кого-и-зачем)
 - [Установка](#установка)
+- [Перенос данных SQLite → PostgreSQL](#перенос-данных-sqlite--postgresql)
 - [Использование](#использование)
 - [Настройка Google OAuth (вход через Google)](#настройка-google-oauth-вход-через-google)
 - [Функционал](#функционал)
@@ -137,36 +138,6 @@ python manage.py runserver
 - **gunicorn**, **whitenoise**, **psycopg2-binary**, **dj-database-url** - продакшен-сервер, статика и PostgreSQL (в т.ч. Railway)
 - **requests**, **PyJWT**, **cryptography** - вспомогательные зависимости (OAuth и др.)
 
-## Деплой на Railway
-
-Проект готов к запуску на [Railway](https://railway.app): в репозитории есть `railway.toml` (миграции и `collectstatic` в **Release**, Gunicorn в **Deploy**), `runtime.txt` для версии Python и эндпоинт **GET `/health/`** для проверки здоровья.
-
-### Шаги
-
-1. Создайте проект в Railway и подключите этот репозиторий.
-2. Добавьте плагин **PostgreSQL** — переменная **`DATABASE_URL`** подставится в сервис с приложением автоматически (при связывании БД с веб-сервисом).
-3. В переменных веб-сервиса задайте обязательные прод-значения (без **`SECRET_KEY`** воркеры Gunicorn упадут при старте):
-   - **`SECRET_KEY`** — **обязательно**: длинная случайная строка (например вывод `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`). Допустимо имя **`DJANGO_SECRET_KEY`** — то же значение, если так удобнее в Railway.
-   - **`ALLOWED_HOSTS`** — публичный домен без схемы, например `your-app.up.railway.app` (можно несколько через запятую).
-   - **`CSRF_TRUSTED_ORIGINS`** — `https://ваш-домен` (схема **https://** обязательна для публичного URL Railway).
-4. Опционально: **`DEBUG`**=`false` (если не задано, при `RAILWAY_ENVIRONMENT=production` отладка уже выключена).
-5. Укажите **Stripe**, **Google OAuth** (разрешённые redirect URI в консоли Google должны включать `https://ваш-домен/accounts/google/login/callback/`), **Gemini** и остальное по таблице ниже.
-6. В Stripe Dashboard добавьте вебхук на URL  
-   **`https://ваш-домен/membership/webhook/`**  
-   и пропишите **`STRIPE_WEBHOOK_SECRET`**.
-7. После деплоя в админке **Sites** (`/admin/sites/site/1/`) укажите **домен и отображаемое имя** сайта как ваш публичный хост (нужно для django-allauth и корректных ссылок).
-
-### Статика и медиа
-
-- **Статика** обслуживается через **WhiteNoise** из `STATIC_ROOT` после `collectstatic` (уже в `releaseCommand`).
-- **Медиа** (аватары и т.п.) по умолчанию пишутся в эфемерную файловую систему контейнера: при перезапуске они могут пропасть. Для постоянного хранения подключите **Railway Volume**, смонтированный в каталог, совпадающий с `MEDIA_ROOT` (или позже вынесите загрузки в объектное хранилище).
-
-### Если при старте падает Gunicorn / `ImproperlyConfigured: SECRET_KEY`
-
-На Railway при **`DEBUG=false`** (в т.ч. из‑за `RAILWAY_ENVIRONMENT=production`) Django **не подставляет** секрет по умолчанию. Добавьте в сервис переменную **`SECRET_KEY`** (или **`DJANGO_SECRET_KEY`**) и выполните redeploy.
-
-
-- Для облачного Postgres часто нужен SSL: по умолчанию при `DEBUG=false` включён **`DATABASE_SSL_REQUIRE`** (через `dj-database-url`). При локальном Postgres без SSL задайте `DATABASE_SSL_REQUIRE=false`.
 
 ## Переменные окружения (.env)
 
@@ -174,7 +145,7 @@ python manage.py runserver
 
 | Переменная | Назначение |
 |------------|------------|
-| `SECRET_KEY` | Секретный ключ Django (**обязателен в продакшене**). Можно задать вместо него **`DJANGO_SECRET_KEY`** с тем же значением. |
+| `SECRET_KEY` | Секретный ключ Django (**обязателен для работы приложения в проде**). Альтернатива: **`DJANGO_SECRET_KEY`**. |
 | `DEBUG` | `true` / `false` - режим отладки. |
 | `ALLOWED_HOSTS` | Список хостов через **запятую** (например `localhost,127.0.0.1`). Если пусто при `DEBUG=true`, разрешены все. |
 | `CSRF_TRUSTED_ORIGINS` | Доверенные origin для CSRF через **запятую** (нужно при HTTPS и кастомном домене). |
@@ -182,7 +153,9 @@ python manage.py runserver
 | `LANGUAGE_CODE` | Язык по умолчанию, например `ru`. |
 | `TIME_ZONE` | Часовой пояс, например `UTC`. |
 | `DATABASE_URL` | Строка подключения PostgreSQL (**Railway** подставляет при подключении плагина БД). Если задана, используется вместо SQLite и вместо блока `USE_POSTGRES` / `POSTGRES_*`. |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | Если **`DATABASE_URL`** пуст, из этих переменных собирается URL PostgreSQL. Не смешивайте **два разных** набора: при непустом `DATABASE_URL` поля `DB_*` не используются. |
 | `DATABASE_SSL_REQUIRE` | `true` / `false` — требовать SSL к Postgres (по умолчанию `true`, когда `DEBUG=false`). |
+| `COPY_FROM_SQLITE_PATH` | Путь к файлу **старой** SQLite только для разовой команды **`python manage.py sqlite_to_postgres`**. Работает, если `default` — PostgreSQL. После переноса можно удалить. |
 | `USE_POSTGRES` | `true` — PostgreSQL по отдельным переменным `POSTGRES_*` (если **нет** `DATABASE_URL`). |
 | `SQLITE_PATH` | Путь к файлу SQLite относительно корня проекта или абсолютный (по умолчанию `db.sqlite3`). |
 | `POSTGRES_DB` | Имя БД PostgreSQL. |

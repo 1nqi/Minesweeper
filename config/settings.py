@@ -1,4 +1,6 @@
 import os
+import secrets
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -23,12 +25,17 @@ def _env_list(key: str, default=None):
 
 
 _railway_prod = os.getenv('RAILWAY_ENVIRONMENT') == 'production'
+_collectstatic = len(sys.argv) > 1 and sys.argv[1] == 'collectstatic'
 
 _secret_env = (os.getenv('SECRET_KEY') or os.getenv('DJANGO_SECRET_KEY') or '').strip()
 DEBUG = _env_bool('DEBUG', False if _railway_prod else True)
 
 if _secret_env:
     SECRET_KEY = _secret_env
+elif _collectstatic:
+    SECRET_KEY = (os.getenv('SECRET_KEY_BUILD') or '').strip() or (
+        'railway-build-collectstatic-' + secrets.token_urlsafe(48)
+    )
 elif DEBUG:
     SECRET_KEY = 'django-insecure-ms-dev-key-change-in-production-!@#$%'
 else:
@@ -115,6 +122,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 _database_url = os.getenv('DATABASE_URL', '').strip()
 
+if not _database_url:
+    # Типичный шаблон (Railway/Compose): DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+    _db_name = (os.getenv('DB_NAME') or '').strip()
+    _db_user = (os.getenv('DB_USER') or '').strip()
+    _db_host = (os.getenv('DB_HOST') or '').strip()
+    if _db_name and _db_user and _db_host:
+        from urllib.parse import quote_plus
+
+        _db_pass = os.getenv('DB_PASSWORD') or ''
+        _db_port = (os.getenv('DB_PORT') or '5432').strip()
+        _database_url = (
+            f'postgresql://{quote_plus(_db_user)}:{quote_plus(_db_pass)}'
+            f'@{_db_host}:{_db_port}/{_db_name}'
+        )
+
 if _database_url:
     import dj_database_url
 
@@ -146,6 +168,20 @@ else:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': _sqlite,
         }
+    }
+
+# Второй источник только для разовой команды переноса: sqlite_to_postgres
+_sqlite_copy_src = os.getenv('COPY_FROM_SQLITE_PATH', '').strip()
+if (
+    _sqlite_copy_src
+    and DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql'
+):
+    _sp = Path(_sqlite_copy_src)
+    if not _sp.is_absolute():
+        _sp = BASE_DIR / _sp
+    DATABASES['sqlite_legacy'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(_sp.resolve()),
     }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -237,7 +273,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 if not DEBUG:
-    if SECRET_KEY.startswith('django-insecure'):
+    if SECRET_KEY.startswith('django-insecure') and not _collectstatic:
         raise ImproperlyConfigured(
             'В продакшене нельзя использовать dev SECRET_KEY. Задайте длинную случайную строку в SECRET_KEY.'
         )

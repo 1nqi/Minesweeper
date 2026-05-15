@@ -30,7 +30,11 @@ def register_view(request):
     else:
         form = SignupForm()
 
-    return render(request, 'registration/register.html', {'form': form})
+    next_url = request.POST.get('next') or request.GET.get('next') or '/'
+    return render(request, 'registration/register.html', {
+        'form': form,
+        'next_url': next_url,
+    })
 
 
 @csrf_protect
@@ -77,7 +81,3 @@ def logout_view(request):
     logout(request)
     messages.success(request, _('Вы вышли из аккаунта.'))
     return redirect('home')
-
-
-def google_login(request):
-    return redirect('/accounts/google/login/')

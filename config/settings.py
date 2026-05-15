@@ -24,12 +24,20 @@ def _env_list(key: str, default=None):
 
 _railway_prod = os.getenv('RAILWAY_ENVIRONMENT') == 'production'
 
-SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    'django-insecure-ms-dev-key-change-in-production-!@#$%',
-)
-
+_secret_env = (os.getenv('SECRET_KEY') or os.getenv('DJANGO_SECRET_KEY') or '').strip()
 DEBUG = _env_bool('DEBUG', False if _railway_prod else True)
+
+if _secret_env:
+    SECRET_KEY = _secret_env
+elif DEBUG:
+    SECRET_KEY = 'django-insecure-ms-dev-key-change-in-production-!@#$%'
+else:
+    raise ImproperlyConfigured(
+        'Укажите переменную окружения SECRET_KEY (для Railway: Variables → New Variable). '
+        'Сгенерируйте ключ локально: '
+        'python -c "from django.core.management.utils import get_random_secret_key; '
+        'print(get_random_secret_key())"'
+    )
 
 _hosts = _env_list('ALLOWED_HOSTS')
 if _hosts:
@@ -97,6 +105,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'profiles.context_processors.user_profile',
+                'accounts.context_processors.google_oauth',
             ],
         },
     },
@@ -153,9 +162,15 @@ AUTHENTICATION_BACKENDS = [
 
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https' if not DEBUG else 'http'
+
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_ADAPTER = 'accounts.adapters.SocialAccountAdapter'
+
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
@@ -222,9 +237,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 if not DEBUG:
-    if not os.getenv('SECRET_KEY') or SECRET_KEY.startswith('django-insecure'):
+    if SECRET_KEY.startswith('django-insecure'):
         raise ImproperlyConfigured(
-            'Set SECRET_KEY to a long random string in production (Railway Variables).'
+            'В продакшене нельзя использовать dev SECRET_KEY. Задайте длинную случайную строку в SECRET_KEY.'
         )
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True

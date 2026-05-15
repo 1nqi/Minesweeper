@@ -7,6 +7,7 @@
 - [Что сделано, для кого и зачем](#что-сделано-для-кого-и-зачем)
 - [Установка](#установка)
 - [Использование](#использование)
+- [Настройка Google OAuth (вход через Google)](#настройка-google-oauth-вход-через-google)
 - [Функционал](#функционал)
 - [Зависимости](#зависимости)
 - [Деплой на Railway](#деплой-на-railway)
@@ -91,7 +92,26 @@ python manage.py runserver
 
 ## Использование
 
-После запуска откройте в браузере **http://127.0.0.1:8000/** (или тот URL, который вы настроили в `ALLOWED_HOSTS`). Регистрация и вход - через форму или Google (если заданы `GOOGLE_OAUTH_*`).
+После запуска откройте в браузере **http://127.0.0.1:8000/** (или тот URL, который вы настроили в `ALLOWED_HOSTS`). Регистрация и вход - через форму или Google, если заданы `GOOGLE_OAUTH_CLIENT_ID` и `GOOGLE_OAUTH_SECRET` (иначе кнопки Google скрыты).
+
+## Настройка Google OAuth (вход через Google)
+
+1. В [Google Cloud Console](https://console.cloud.google.com/) создайте проект (или выберите существующий).
+2. Включите API **Google+ API** не обязателен для базового OAuth; достаточно экрана согласия OAuth и учётных данных.
+3. **Экран согласия OAuth** (OAuth consent screen): тип *External* для теста, добавьте тестовых пользователей при статусе *Testing*.
+4. **Учётные данные** → *Create credentials* → **OAuth client ID** → тип **Web application**:
+   - **Authorized JavaScript origins** (примеры):
+     - `http://127.0.0.1:8000`
+     - `http://localhost:8000`
+     - `https://ваш-публичный-домен` (продакшен)
+   - **Authorized redirect URIs** (обязательно точное совпадение пути allauth):
+     - `http://127.0.0.1:8000/accounts/google/login/callback/`
+     - `http://localhost:8000/accounts/google/login/callback/`
+     - `https://ваш-домен/accounts/google/login/callback/`
+5. Скопируйте **Client ID** и **Client secret** в `.env`: `GOOGLE_OAUTH_CLIENT_ID` и `GOOGLE_OAUTH_SECRET`.
+6. В админке Django (**Sites** → сайт с `SITE_ID=1`) укажите **доменное имя** вашего сайта (для продакшена — публичный хост без `https://`). Это важно для корректных ссылок в письмах и части сценариев allauth.
+
+Если пользователь уже зарегистрировался по паролю с тем же email, что у Google, соцаккаунт **привяжется к существующей учётной записи** (кастомный `SocialAccountAdapter` в `accounts/adapters.py`), вместо ошибки «email занят».
 
 ## Функционал
 
@@ -125,8 +145,8 @@ python manage.py runserver
 
 1. Создайте проект в Railway и подключите этот репозиторий.
 2. Добавьте плагин **PostgreSQL** — переменная **`DATABASE_URL`** подставится в сервис с приложением автоматически (при связывании БД с веб-сервисом).
-3. В переменных веб-сервиса задайте обязательные прод-значения:
-   - **`SECRET_KEY`** — длинная случайная строка (не используйте dev-значение по умолчанию).
+3. В переменных веб-сервиса задайте обязательные прод-значения (без **`SECRET_KEY`** воркеры Gunicorn упадут при старте):
+   - **`SECRET_KEY`** — **обязательно**: длинная случайная строка (например вывод `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`). Допустимо имя **`DJANGO_SECRET_KEY`** — то же значение, если так удобнее в Railway.
    - **`ALLOWED_HOSTS`** — публичный домен без схемы, например `your-app.up.railway.app` (можно несколько через запятую).
    - **`CSRF_TRUSTED_ORIGINS`** — `https://ваш-домен` (схема **https://** обязательна для публичного URL Railway).
 4. Опционально: **`DEBUG`**=`false` (если не задано, при `RAILWAY_ENVIRONMENT=production` отладка уже выключена).
@@ -141,7 +161,10 @@ python manage.py runserver
 - **Статика** обслуживается через **WhiteNoise** из `STATIC_ROOT` после `collectstatic` (уже в `releaseCommand`).
 - **Медиа** (аватары и т.п.) по умолчанию пишутся в эфемерную файловую систему контейнера: при перезапуске они могут пропасть. Для постоянного хранения подключите **Railway Volume**, смонтированный в каталог, совпадающий с `MEDIA_ROOT` (или позже вынесите загрузки в объектное хранилище).
 
-### Если база не подключается
+### Если при старте падает Gunicorn / `ImproperlyConfigured: SECRET_KEY`
+
+На Railway при **`DEBUG=false`** (в т.ч. из‑за `RAILWAY_ENVIRONMENT=production`) Django **не подставляет** секрет по умолчанию. Добавьте в сервис переменную **`SECRET_KEY`** (или **`DJANGO_SECRET_KEY`**) и выполните redeploy.
+
 
 - Для облачного Postgres часто нужен SSL: по умолчанию при `DEBUG=false` включён **`DATABASE_SSL_REQUIRE`** (через `dj-database-url`). При локальном Postgres без SSL задайте `DATABASE_SSL_REQUIRE=false`.
 
@@ -151,7 +174,7 @@ python manage.py runserver
 
 | Переменная | Назначение |
 |------------|------------|
-| `SECRET_KEY` | Секретный ключ Django (**обязательно сменить в продакшене**). |
+| `SECRET_KEY` | Секретный ключ Django (**обязателен в продакшене**). Можно задать вместо него **`DJANGO_SECRET_KEY`** с тем же значением. |
 | `DEBUG` | `true` / `false` - режим отладки. |
 | `ALLOWED_HOSTS` | Список хостов через **запятую** (например `localhost,127.0.0.1`). Если пусто при `DEBUG=true`, разрешены все. |
 | `CSRF_TRUSTED_ORIGINS` | Доверенные origin для CSRF через **запятую** (нужно при HTTPS и кастомном домене). |

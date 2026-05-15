@@ -1,4 +1,0 @@
-# https://docs.railway.com/guides/config-as-code
-[deploy]
-releaseCommand = "python manage.py migrate --noinput"
-startCommand = "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"

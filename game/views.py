@@ -1,6 +1,7 @@
 import json
 import random
 
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -17,7 +18,10 @@ RANKED_MODES = ('classic', 'speed')
 
 
 def index(request):
-    return render(request, 'game/index.html')
+    gemini_on = bool((getattr(settings, 'GEMINI_API_KEY', '') or '').strip()) and getattr(
+        settings, 'GEMINI_HINT_EXPLAIN', True
+    )
+    return render(request, 'game/index.html', {'gemini_hint_enabled': gemini_on})
 
 
 def _user_is_pro(user):

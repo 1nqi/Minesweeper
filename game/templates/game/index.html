@@ -96,6 +96,9 @@
             <div class="panel-card">
                 <h3 class="panel-title">{% trans "ИИ-подсказка" %}</h3>
                 <p class="panel-hint" style="margin:0 0 8px;font-size:0.8125rem;">{% trans "Безопасная клетка подсвечивается на поле." %}</p>
+                {% if gemini_hint_enabled %}
+                <p class="panel-hint" style="margin:0 0 8px;font-size:0.8125rem;">{% trans "Короткое пояснение от Gemini к этой клетке." %}</p>
+                {% endif %}
                 <div class="panel-ai-hint">
                     <button type="button" class="btn-ai-hint" id="btn-ai-hint">{% trans "Подсказка" %}</button>
                     <div class="ai-hint-meta" id="ai-hint-meta"></div>

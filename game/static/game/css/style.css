@@ -413,13 +413,37 @@
 }
 
 .cell-ai-hint-pulse {
-    box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.85);
-    animation: ai-hint-pulse 0.9s ease-out 2;
+    z-index: 6;
+    outline: 3px solid #ffc107;
+    outline-offset: -3px;
+    /* Яркое «облако» вокруг клетки — заметно на любых темах */
+    box-shadow:
+        0 0 0 2px rgba(255, 193, 7, 0.95),
+        0 0 16px 4px rgba(255, 213, 79, 0.85),
+        0 0 32px 8px rgba(56, 139, 253, 0.55);
+    animation: ai-hint-pulse 1s ease-in-out 4;
 }
 
 @keyframes ai-hint-pulse {
-    from { box-shadow: 0 0 0 0 rgba(56, 139, 253, 0.6); }
-    to { box-shadow: 0 0 0 10px rgba(56, 139, 253, 0); }
+    0%, 100% {
+        outline-color: #ffb300;
+        transform: scale(1);
+        filter: brightness(1.05);
+        box-shadow:
+            0 0 0 2px rgba(255, 193, 7, 0.9),
+            0 0 14px 3px rgba(255, 213, 79, 0.7),
+            0 0 28px 6px rgba(56, 139, 253, 0.45);
+    }
+    50% {
+        outline-color: #fff8e1;
+        outline-width: 4px;
+        transform: scale(1.12);
+        filter: brightness(1.18);
+        box-shadow:
+            0 0 0 3px rgba(255, 241, 118, 1),
+            0 0 22px 8px rgba(255, 193, 7, 0.95),
+            0 0 40px 14px rgba(56, 139, 253, 0.65);
+    }
 }
 
 .game-banner {

@@ -722,6 +722,9 @@ msgstr "AI hint"
 msgid "Безопасная клетка подсвечивается на поле."
 msgstr "A safe cell is highlighted on the board."
 
+msgid "Короткое пояснение от Gemini к этой клетке."
+msgstr "Gemini adds a short explanation for that cell."
+
 msgid "Подсказка"
 msgstr "Hint"
 

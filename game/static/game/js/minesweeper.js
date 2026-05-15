@@ -427,7 +427,7 @@
                     cell.classList.add('cell-ai-hint-pulse');
                     setTimeout(function () {
                         cell.classList.remove('cell-ai-hint-pulse');
-                    }, 2200);
+                    }, 4500);
                 }
                 if (!data.unlimited && typeof data.remaining === 'number') {
                     var aiHintMeta = document.getElementById('ai-hint-meta');

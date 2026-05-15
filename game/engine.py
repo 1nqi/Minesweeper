@@ -10,7 +10,7 @@ DIFFICULTIES = {
     'expert':       {'rows': 16, 'cols': 30, 'mines': 99},
 }
 
-VALID_MODES = ('classic', 'speed', 'noflag', 'daily', 'blind', 'infinite')
+VALID_MODES = ('classic', 'speed', 'noflag', 'daily', 'blind', 'infinite', 'puzzle')
 
 
 def create_game(difficulty: str = 'beginner',
@@ -407,5 +407,8 @@ def get_client_state(state: dict) -> dict:
 
     if state.get('mode') == 'daily':
         result['daily'] = get_daily_info()
+    if state.get('mode') == 'puzzle':
+        result['puzzle_id'] = state.get('puzzle_id')
+        result['puzzle_tier'] = state.get('puzzle_tier', 1)
 
     return result

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Пазлы" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/puzzles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="puzzles-page">
+    <header class="puzzles-hero">
+        <h1 class="puzzles-title">{% trans "Логические пазлы" %}</h1>
+        <p class="puzzles-sub">
+            {% trans "Откройте одну клетку, которую можно вывести из подсказок. Сложность растёт с номером. Ошибка — разбор от ИИ: бесплатно до 3 в день, с Pro — безлимит." %}
+        </p>
+        <p class="puzzles-progress">
+            {% blocktrans with n=solved_count %}Решено: {{ n }}{% endblocktrans %}
+        </p>
+    </header>
+
+    <ul class="puzzles-grid">
+        {% for item in puzzles %}
+        <li class="puzzles-card {% if item.locked %}puzzles-card--locked{% endif %} {% if item.done %}puzzles-card--done{% endif %}">
+            <span class="puzzles-card__tier">{% trans "Уровень" %} {{ item.spec.tier }}</span>
+            <h2 class="puzzles-card__title">{{ item.spec.title }}</h2>
+            <span class="puzzles-card__meta">{{ item.spec.rows }}×{{ item.spec.cols }}</span>
+            {% if item.locked %}
+            <span class="puzzles-card__badge">🔒 {% trans "Закрыто" %}</span>
+            {% elif item.done %}
+            <a class="puzzles-card__cta puzzles-card__cta--secondary" href="{% url 'game:puzzle_play' puzzle_id=item.spec.id %}">{% trans "Снова" %}</a>
+            {% else %}
+            <a class="puzzles-card__cta" href="{% url 'game:puzzle_play' puzzle_id=item.spec.id %}">{% trans "Играть" %}</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

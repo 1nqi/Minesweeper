@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Пазл" %} #{{ puzzle_id }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'game/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/puzzles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-page puzzle-page">
+    <div class="puzzle-play-head">
+        <a class="puzzle-back" href="{% url 'game:puzzles' %}">← {% trans "Все пазлы" %}</a>
+        <div class="puzzle-play-title">
+            <span class="puzzle-play-badge">{% trans "Уровень" %} {{ puzzle_spec.tier }}</span>
+            <h1 class="puzzle-h1">{{ puzzle_spec.title }}</h1>
+        </div>
+        <p class="puzzle-instructions">{% trans "Один ход: откройте клетку, следующую из цифр и флагов. Флаги отключены." %}</p>
+        <p class="puzzle-ai-quota" id="puzzle-ai-quota">
+            {% if puzzle_ai_unlimited %}
+            {% trans "ИИ-разбор ошибки: безлимит (Pro)." %}
+            {% else %}
+            {% blocktrans with r=puzzle_ai_remaining %}ИИ-разборов сегодня осталось: {{ r }}{% endblocktrans %}
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="game-layout">
+        <div class="game-column">
+            <div class="game-board-unit" id="board-unit" data-theme="classic">
+                <div class="game-topbar">
+                    <div class="game-topbar__left">
+                        <span class="puzzle-topbar-label" id="diff-current-label">{% trans "Пазл" %} #{{ puzzle_id }}</span>
+                    </div>
+                    <div class="game-topbar__center">
+                        <div class="counter">
+                            <svg class="counter__icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                                <path d="M6 3v14" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>
+                                <path d="M6 3l9 4.5L6 12V3z" fill="#e74c3c"/>
+                            </svg>
+                            <span class="counter__value" id="mines-left">0</span>
+                        </div>
+                        <div class="counter">
+                            <svg class="counter__icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="11" r="7" stroke="#e8912d" stroke-width="2"/>
+                                <line x1="10" y1="7" x2="10" y2="11" stroke="#e8912d" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="10" y1="11" x2="13" y2="11" stroke="#e8912d" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span class="counter__value" id="timer">000</span>
+                        </div>
+                    </div>
+                    <div class="game-topbar__right">
+                        <button class="topbar-icon-btn" id="btn-restart" title="{% trans 'Заново' %}">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M17.65 6.35A8 8 0 1019 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 2v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="board-wrap">
+                    <div class="board" id="board"></div>
+                </div>
+            </div>
+            <div class="game-banner hidden" id="game-banner">
+                <span class="banner-text" id="banner-text"></span>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="panel-card">
+                <h3 class="panel-title">{% trans "Статус" %}</h3>
+                <div class="panel-status" id="panel-status">{% trans "Игра идёт…" %}</div>
+            </div>
+            <div class="panel-card">
+                <h3 class="panel-title">{% trans "Разбор" %}</h3>
+                <p class="puzzle-explanation" id="puzzle-explanation" hidden></p>
+                <p class="panel-hint puzzle-hint-muted">{% trans "После ошибки — разбор (Gemini при наличии ключа; без Pro — до 3 раз в сутки)." %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<script id="ms-puzzle-bootstrap" type="application/json">{{ initial_state_json }}</script>
+<script>
+window.MS_I18N = Object.assign({}, window.MS_I18N || {}, {
+    beginner: "{% trans 'Новичок' %}",
+    intermediate: "{% trans 'Любитель' %}",
+    expert: "{% trans 'Эксперт' %}",
+    custom: "{% trans 'Своя игра' %}",
+    ready: "{% trans 'Готов к игре' %}",
+    playing: "{% trans 'Игра идёт...' %}",
+    won: "{% trans 'Пазл решён!' %}",
+    lost: "{% trans 'Пазл не решён' %}",
+    winBanner: "{% trans 'Отлично!' %}",
+    lossBanner: "{% trans 'Ошибка' %}",
+    puzzleSolvedBanner: "{% trans 'Верно! Следующий пазл в списке.' %}",
+    puzzlesList: "{% trans 'К списку пазлов' %}",
+    anonymous: "{% trans 'Аноним' %}",
+    modeClassic: "{% trans 'Классический' %}",
+    modeSpeed: "{% trans 'Скоростной режим' %}",
+    modeNoflag: "{% trans 'Без флагов' %}",
+    modeDaily: "{% trans 'Ежедневный вызов' %}",
+    modeBlind: "{% trans 'Вслепую' %}",
+    modeInfinite: "{% trans 'Бесконечный' %}",
+    puzzleAiUnlimited: "{% trans 'ИИ-разбор: безлимит (Pro).' %}",
+    puzzleAiRemaining: "{% trans 'ИИ-разборов сегодня осталось:' %}"
+});
+window.MS_GAME = {
+    isPro: {% if user_profile and user_profile.is_pro %}true{% else %}false{% endif %},
+    isAuth: {% if user.is_authenticated %}true{% else %}false{% endif %},
+    membershipUrl: "{% url 'membership:plans' %}",
+    aiStatusUrl: "",
+    aiHintUrl: "",
+    freeThemes: ['classic', 'ocean']
+};
+window.MS_PUZZLE = {
+    revealUrl: "{% url 'game:api_puzzle_reveal' %}",
+    resetUrl: "{% url 'game:api_puzzle_reset' %}",
+    puzzleId: {{ puzzle_id }},
+    listUrl: "{% url 'game:puzzles' %}"
+};
+window.MS_PUZZLE_BOOTSTRAP = JSON.parse(document.getElementById('ms-puzzle-bootstrap').textContent);
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'game/js/minesweeper.js' %}"></script>
+{% endblock %}

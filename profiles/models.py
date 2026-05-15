@@ -45,6 +45,9 @@ class UserProfile(models.Model):
     ai_assist_date = models.DateField(blank=True, null=True)
     ai_assist_count = models.PositiveSmallIntegerField(default=0)
 
+    puzzle_ai_explain_date = models.DateField(blank=True, null=True)
+    puzzle_ai_explain_count = models.PositiveSmallIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

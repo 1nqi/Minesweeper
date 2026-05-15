@@ -34,6 +34,35 @@
         freeThemes: ['classic', 'ocean']
     };
 
+    var PZ = window.MS_PUZZLE || null;
+
+    function revealEndpoint() {
+        return (PZ && PZ.revealUrl) ? PZ.revealUrl : '/play/api/reveal/';
+    }
+
+    function showPuzzleExplanation(text) {
+        var el = document.getElementById('puzzle-explanation');
+        if (!el) return;
+        if (text) {
+            el.textContent = text;
+            el.hidden = false;
+        } else {
+            el.textContent = '';
+            el.hidden = true;
+        }
+    }
+
+    function updatePuzzleAiQuota(state) {
+        var el = document.getElementById('puzzle-ai-quota');
+        if (!el || !PZ || !('puzzle_ai_unlimited' in state)) return;
+        if (state.puzzle_ai_unlimited) {
+            el.textContent = T.puzzleAiUnlimited || '';
+        } else {
+            var r = state.puzzle_ai_remaining;
+            el.textContent = (T.puzzleAiRemaining || '') + ' ' + (r != null ? r : '');
+        }
+    }
+
     var diffLabels = {
         beginner: T.beginner || 'Beginner',
         intermediate: T.intermediate || 'Intermediate',
@@ -129,7 +158,7 @@
 
     function updateModeBadge() {
         if (modeBadge) {
-            if (currentMode === 'classic') {
+            if (PZ || currentMode === 'classic') {
                 modeBadge.style.display = 'none';
             } else {
                 modeBadge.style.display = '';
@@ -152,6 +181,7 @@
     function render(state) {
         gameState = state;
         currentMode = state.mode || 'classic';
+        if (PZ) currentMode = 'puzzle';
 
         applyCellSize(state.rows, state.cols);
         board.style.gridTemplateColumns = 'repeat(' + state.cols + ', var(--cell-size))';
@@ -253,15 +283,35 @@
 
         if (gameState.status === 'ready') startTimer();
 
-        api('/play/api/reveal/', { row: row, col: col }).then(function (state) {
+        api(revealEndpoint(), { row: row, col: col }).then(function (state) {
+            if (state.puzzle_fail && state.explanation) {
+                showPuzzleExplanation(state.explanation);
+            } else {
+                showPuzzleExplanation('');
+            }
+            updatePuzzleAiQuota(state);
             render(state);
-            if (state.status === 'won') {
+            if (state.status === 'won' && !PZ) {
                 setTimeout(function () { showWinModal(state.elapsed); }, 400);
+            } else if (state.status === 'won' && PZ) {
+                if (gameBanner) {
+                    gameBanner.className = 'game-banner won';
+                    gameBanner.classList.remove('hidden');
+                }
+                if (bannerText && PZ.listUrl) {
+                    bannerText.innerHTML = (T.puzzleSolvedBanner || 'Solved!') + ' <a href="' + PZ.listUrl + '">' + (T.puzzlesList || 'All puzzles') + '</a>';
+                }
+                stopTimer();
+                if (timerEl && state.elapsed) timerEl.textContent = padTimer(Math.floor(state.elapsed));
             }
         });
     });
 
     board.addEventListener('contextmenu', function (e) {
+        if (PZ) {
+            e.preventDefault();
+            return;
+        }
         e.preventDefault();
         var cell = e.target.closest('.cell');
         if (!cell) return;
@@ -280,6 +330,7 @@
     });
 
     board.addEventListener('auxclick', function (e) {
+        if (PZ) return;
         if (e.button !== 1) return;
         e.preventDefault();
         var cell = e.target.closest('.cell');
@@ -289,15 +340,32 @@
         var row = parseInt(cell.getAttribute('data-row'));
         var col = parseInt(cell.getAttribute('data-col'));
 
-        api('/play/api/reveal/', { row: row, col: col }).then(function (state) {
+        api(revealEndpoint(), { row: row, col: col }).then(function (state) {
+            if (state.puzzle_fail && state.explanation) {
+                showPuzzleExplanation(state.explanation);
+            } else {
+                showPuzzleExplanation('');
+            }
+            updatePuzzleAiQuota(state);
             render(state);
-            if (state.status === 'won') {
+            if (state.status === 'won' && !PZ) {
                 setTimeout(function () { showWinModal(state.elapsed); }, 400);
+            } else if (state.status === 'won' && PZ) {
+                if (gameBanner) {
+                    gameBanner.className = 'game-banner won';
+                    gameBanner.classList.remove('hidden');
+                }
+                if (bannerText && PZ.listUrl) {
+                    bannerText.innerHTML = (T.puzzleSolvedBanner || 'Solved!') + ' <a href="' + PZ.listUrl + '">' + (T.puzzlesList || 'All puzzles') + '</a>';
+                }
+                stopTimer();
+                if (timerEl && state.elapsed) timerEl.textContent = padTimer(Math.floor(state.elapsed));
             }
         });
     });
 
     function newGame(difficulty, rows, cols, mines, mode) {
+        if (PZ) return;
         stopTimer();
         clearBlindTimers();
         localTime = 0;
@@ -320,36 +388,50 @@
         api('/play/api/new/', payload).then(render);
     }
 
-    document.getElementById('btn-restart').addEventListener('click', function () {
-        newGame(currentDifficulty, null, null, null, currentMode);
-    });
+    var rst = document.getElementById('btn-restart');
+    if (rst) {
+        rst.addEventListener('click', function () {
+            if (PZ && PZ.resetUrl && PZ.puzzleId != null) {
+                showPuzzleExplanation('');
+                if (gameBanner) gameBanner.classList.add('hidden');
+                api(PZ.resetUrl, { puzzle_id: PZ.puzzleId }).then(function (state) {
+                    updatePuzzleAiQuota(state);
+                    render(state);
+                });
+            } else {
+                newGame(currentDifficulty, null, null, null, currentMode);
+            }
+        });
+    }
 
     var dropdownBtn = document.getElementById('diff-dropdown-btn');
     var dropdownMenu = document.getElementById('diff-dropdown-menu');
 
-    dropdownBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('open');
-    });
-
-    document.addEventListener('click', function () {
-        dropdownMenu.classList.remove('open');
-    });
-
-    document.querySelectorAll('.diff-dropdown__item').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.diff-dropdown__item').forEach(function (b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-            dropdownMenu.classList.remove('open');
-
-            var diff = btn.getAttribute('data-diff');
-            if (diff === 'custom') {
-                showModal('custom-modal');
-            } else {
-                newGame(diff, null, null, null, currentMode);
-            }
+    if (!PZ && dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('open');
         });
-    });
+
+        document.addEventListener('click', function () {
+            dropdownMenu.classList.remove('open');
+        });
+
+        document.querySelectorAll('.diff-dropdown__item').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.diff-dropdown__item').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                dropdownMenu.classList.remove('open');
+
+                var diff = btn.getAttribute('data-diff');
+                if (diff === 'custom') {
+                    showModal('custom-modal');
+                } else {
+                    newGame(diff, null, null, null, currentMode);
+                }
+            });
+        });
+    }
 
     function setTheme(theme) {
         currentTheme = theme;
@@ -451,13 +533,22 @@
     }
 
     function showModal(id) {
-        document.getElementById(id).classList.add('active');
+        var m = document.getElementById(id);
+        if (m) m.classList.add('active');
     }
 
     function hideModal(id) {
-        document.getElementById(id).classList.remove('active');
+        var m = document.getElementById(id);
+        if (m) m.classList.remove('active');
     }
 
+    function showWinModal(elapsed) {
+        var wt = document.getElementById('win-time');
+        if (wt) wt.textContent = elapsed.toFixed(1);
+        showModal('win-modal');
+    }
+
+    if (!PZ) {
     document.getElementById('custom-start').addEventListener('click', function () {
         var rows = parseInt(document.getElementById('custom-rows').value) || 16;
         var cols = parseInt(document.getElementById('custom-cols').value) || 16;
@@ -470,11 +561,6 @@
         hideModal('custom-modal');
     });
 
-    function showWinModal(elapsed) {
-        document.getElementById('win-time').textContent = elapsed.toFixed(1);
-        showModal('win-modal');
-    }
-
     document.getElementById('win-save').addEventListener('click', function () {
         var name = document.getElementById('win-name').value.trim() || (T.anonymous || 'Anonymous');
         api('/play/api/save/', { name: name }).then(function () {
@@ -485,6 +571,7 @@
     document.getElementById('win-skip').addEventListener('click', function () {
         hideModal('win-modal');
     });
+    }
 
     document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
         overlay.addEventListener('click', function (e) {
@@ -508,12 +595,18 @@
         }, 100);
     });
 
-    // Read mode from URL
-    var urlParams = new URLSearchParams(window.location.search);
-    var initMode = urlParams.get('mode') || 'classic';
-    if (['classic', 'speed', 'noflag', 'daily', 'blind', 'infinite'].indexOf(initMode) === -1) {
-        initMode = 'classic';
-    }
+    if (PZ && window.MS_PUZZLE_BOOTSTRAP) {
+        currentMode = 'puzzle';
+        updateModeBadge();
+        startTimer();
+        render(window.MS_PUZZLE_BOOTSTRAP);
+    } else {
+        var urlParams = new URLSearchParams(window.location.search);
+        var initMode = urlParams.get('mode') || 'classic';
+        if (['classic', 'speed', 'noflag', 'daily', 'blind', 'infinite'].indexOf(initMode) === -1) {
+            initMode = 'classic';
+        }
 
-    newGame('beginner', null, null, null, initMode);
+        newGame('beginner', null, null, null, initMode);
+    }
 })();

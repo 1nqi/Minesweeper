@@ -778,3 +778,108 @@ msgstr "Price ID must look like price_… (Dashboard → Product → Prices)."
 
 msgid "Годовой STRIPE_PRICE_PRO_YEARLY должен быть price_…"
 msgstr "Yearly STRIPE_PRICE_PRO_YEARLY must be a price_… id"
+
+msgid "Пазлы"
+msgstr "Puzzles"
+
+msgid "Логические пазлы"
+msgstr "Logic puzzles"
+
+msgid "Откройте одну клетку, которую можно вывести из подсказок. Сложность растёт с номером. Ошибка — разбор от ИИ: бесплатно до 3 в день, с Pro — безлимит."
+msgstr "Open one cell that you can deduce from the clues. Difficulty increases with the number. If you make a mistake — an AI walkthrough: free up to 3 times per day, unlimited with Pro."
+
+msgid "Решено: %(n)s"
+msgstr "Solved: %(n)s"
+
+msgid "Уровень"
+msgstr "Level"
+
+msgid "Закрыто"
+msgstr "Locked"
+
+msgid "Снова"
+msgstr "Again"
+
+msgid "Пазл не найден."
+msgstr "Puzzle not found."
+
+msgid "Сначала пройдите предыдущие пазлы."
+msgstr "Finish the previous puzzles first."
+
+msgid "Все пазлы"
+msgstr "All puzzles"
+
+msgid "Один ход: откройте клетку, следующую из цифр и флагов. Флаги отключены."
+msgstr "One move: open a cell deducible from numbers and flags. Flags are disabled."
+
+msgid "Пазл"
+msgstr "Puzzle"
+
+msgid "Игра идёт…"
+msgstr "Playing…"
+
+msgid "Разбор"
+msgstr "Review"
+
+msgid "После ошибки здесь появится пояснение (Gemini, если задан API‑ключ)."
+msgstr "After a mistake, an explanation appears here (Gemini when GEMINI_API_KEY is set)."
+
+msgid "После ошибки — разбор (Gemini при наличии ключа; без Pro — до 3 раз в сутки)."
+msgstr "After a mistake — a walkthrough (Gemini when a key is configured; without Pro — up to 3 times per day)."
+
+msgid "ИИ-разбор ошибки: безлимит (Pro)."
+msgstr "AI mistake walkthrough: unlimited (Pro)."
+
+msgid "ИИ-разборов сегодня осталось: %(r)s"
+msgstr "AI walkthroughs left today: %(r)s"
+
+msgid "ИИ-разбор: безлимит (Pro)."
+msgstr "AI walkthrough: unlimited (Pro)."
+
+msgid "ИИ-разборов сегодня осталось:"
+msgstr "AI walkthroughs left today:"
+
+msgid "Отлично!"
+msgstr "Nice!"
+
+msgid "Лимит ИИ-объяснений к пазлам на сегодня исчерпан (3 для бесплатных аккаунтов). Оформите Pro для безлимита или вернитесь завтра."
+msgstr "Your daily AI puzzle explanations are used up (3 for free accounts). Get Pro for unlimited explanations or come back tomorrow."
+
+msgid "Заново"
+msgstr "Retry"
+
+msgid "Пазл решён!"
+msgstr "Puzzle solved!"
+
+msgid "Пазл не решён"
+msgstr "Puzzle not solved"
+
+msgid "Ошибка"
+msgstr "Mistake"
+
+msgid "Верно! Следующий пазл в списке."
+msgstr "Correct! Continue with the next puzzle in the list."
+
+msgid "К списку пазлов"
+msgstr "Back to puzzle list"
+
+msgid "«3» и три флага: остальные соседи пустые"
+msgstr "A 3 with three flags — the remaining neighbors are safe"
+
+msgid "Угол: «1» и один флаг-мина"
+msgstr "Corner 1 and one flagged mine"
+
+msgid "«2» и две отмеченные мины рядом"
+msgstr "A 2 with two marked mines nearby"
+
+msgid "Две «1» с одной общей миной"
+msgstr "Two 1s sharing one flagged mine"
+
+msgid "«3» на поле 7×7"
+msgstr "A 3 on a 7×7 board"
+
+msgid "«4» и четыре мины по углам окрестности"
+msgstr "A 4 with four mines on diagonal corners of its neighborhood"
+
+msgid "Три флага под «3»"
+msgstr "Three flags under a 3"

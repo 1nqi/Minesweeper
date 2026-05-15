@@ -427,6 +427,21 @@ msgstr "The board expands — play until you lose"
 msgid "У всех игроков одинаковое поле. Покажи лучшее время!"
 msgstr "All players get the same board. Show your best time!"
 
+msgid "Игроки"
+msgstr "Players"
+
+msgid "Страны"
+msgstr "Countries"
+
+msgid "Игроков"
+msgstr "Players"
+
+msgid "Режим"
+msgstr "Mode"
+
+msgid "Поражений"
+msgstr "Losses"
+
 # --- Countries ---
 
 msgid "— Не указана —"

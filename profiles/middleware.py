@@ -17,7 +17,7 @@ class UserLanguageMiddleware:
                     translation.activate(profile.language)
                     request.LANGUAGE_CODE = profile.language
 
-                # обновляем онлайн-статус не чаще раза в минуту
+#update status in one minute
                 now = timezone.now()
                 if not profile.last_seen or (now - profile.last_seen).total_seconds() > 60:
                     profile.is_online = True

@@ -35,7 +35,6 @@
                 <form method="post" enctype="multipart/form-data" id="settings-form">
                     {% csrf_token %}
 
-                    <!-- ===== Profile section ===== -->
                     <div class="settings-section" id="section-profile">
                         <div class="settings-content__header">
                             <h1 class="settings-content__title">{% trans "Публичный профиль" %}</h1>
@@ -120,8 +119,6 @@
                             {% endfor %}
                         </div>
                     </div>
-
-                    <!-- ===== Appearance section ===== -->
                     <div class="settings-section" id="section-appearance" style="display:none">
                         <div class="settings-content__header">
                             <h1 class="settings-content__title">{% trans "Внешний вид" %}</h1>
@@ -143,8 +140,6 @@
                             <a href="{% url 'profiles:detail' username=request.user.username %}" class="btn-cancel">{% trans "Отмена" %}</a>
                         </div>
                     </div>
-
-                    <!-- ===== Account section ===== -->
                     <div class="settings-section" id="section-account" style="display:none">
                         <div class="settings-content__header">
                             <h1 class="settings-content__title">{% trans "Аккаунт" %}</h1>
@@ -182,7 +177,6 @@
 {% block extra_js %}
 <script>
 (function() {
-    // --- Sections nav ---
     var navItems = document.querySelectorAll('.settings-nav__item');
     navItems.forEach(function(item) {
         item.addEventListener('click', function(e) {
@@ -194,8 +188,6 @@
             document.getElementById('section-' + target).style.display = '';
         });
     });
-
-    // --- Flair picker ---
     var flairInput = document.getElementById('id_flair_emoji');
     var flairPreview = document.getElementById('flair-preview');
 
@@ -214,7 +206,6 @@
         flairPreview.textContent = '';
     });
 
-    // --- Bio counter ---
     var bio = document.querySelector('#id_bio, [name="bio"]');
     var bioCounter = document.getElementById('bio-counter');
     if (bio && bioCounter) {
@@ -223,7 +214,6 @@
         });
     }
 
-    // --- Avatar preview ---
     var avatarInput = document.querySelector('[name="avatar"]');
     if (avatarInput) {
         avatarInput.addEventListener('change', function() {

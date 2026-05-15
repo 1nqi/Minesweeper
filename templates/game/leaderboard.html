@@ -17,12 +17,25 @@
             <p class="lb-subtitle">{% trans "Лучшие результаты игроков со всего мира" %}</p>
         </div>
 
+        <div class="lb-view-tabs">
+            <a href="?view=players&difficulty={{ difficulty }}{% if current_country %}&country={{ current_country }}{% endif %}"
+               class="lb-view-tab {% if view == 'players' %}is-active{% endif %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                {% trans "Игроки" %}
+            </a>
+            <a href="?view=countries&difficulty={{ difficulty }}"
+               class="lb-view-tab {% if view == 'countries' %}is-active{% endif %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20" stroke="currentColor" stroke-width="2"/></svg>
+                {% trans "Страны" %}
+            </a>
+        </div>
+
         <div class="lb-filters">
             <div class="lb-filter-group">
                 <span class="lb-filter-label">{% trans "Сложность" %}</span>
                 <div class="lb-pills">
                     {% for d_key, d_label in difficulties %}
-                    <a href="?difficulty={{ d_key }}{% if current_country %}&country={{ current_country }}{% endif %}"
+                    <a href="?view={{ view }}&difficulty={{ d_key }}{% if current_country and view == 'players' %}&country={{ current_country }}{% endif %}"
                        class="lb-pill {% if difficulty == d_key %}is-active{% endif %}">
                         {{ d_label }}
                     </a>
@@ -30,15 +43,16 @@
                 </div>
             </div>
 
+            {% if view == 'players' %}
             <div class="lb-filter-group">
                 <span class="lb-filter-label">{% trans "Страна" %}</span>
                 <div class="lb-country-filter">
-                    <a href="?difficulty={{ difficulty }}"
+                    <a href="?view=players&difficulty={{ difficulty }}"
                        class="lb-pill {% if not current_country %}is-active{% endif %}">
                         🌍 {% trans "Все страны" %}
                     </a>
                     {% for code, name in available_countries %}
-                    <a href="?difficulty={{ difficulty }}&country={{ code }}"
+                    <a href="?view=players&difficulty={{ difficulty }}&country={{ code }}"
                        class="lb-pill lb-pill--country {% if current_country == code %}is-active{% endif %}">
                         <img src="https://flagcdn.com/w20/{{ code|lower }}.png" width="16" height="12" alt="{{ name }}" class="lb-pill-flag">
                         {{ name }}
@@ -46,10 +60,51 @@
                     {% endfor %}
                 </div>
             </div>
+            {% endif %}
         </div>
 
         <div class="lb-card">
-            {% if rows %}
+            {% if view == 'countries' %}
+                {% if country_rows %}
+                <table class="lb-table">
+                    <thead>
+                        <tr>
+                            <th class="lb-th-rank">#</th>
+                            <th>{% trans "Страна" %}</th>
+                            <th class="lb-th-num">{% trans "Игроков" %}</th>
+                            <th class="lb-th-num">{% trans "Побед" %}</th>
+                            <th class="lb-th-time">{% trans "Лучшее время" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in country_rows %}
+                        <tr class="lb-row {% if row.rank <= 3 %}lb-row--top{{ row.rank }}{% endif %}">
+                            <td class="lb-rank">
+                                {% if row.rank == 1 %}<span class="lb-medal">🥇</span>
+                                {% elif row.rank == 2 %}<span class="lb-medal">🥈</span>
+                                {% elif row.rank == 3 %}<span class="lb-medal">🥉</span>
+                                {% else %}{{ row.rank }}{% endif %}
+                            </td>
+                            <td class="lb-country-cell">
+                                <a href="?view=players&difficulty={{ difficulty }}&country={{ row.country }}" class="lb-country-link">
+                                    <img src="https://flagcdn.com/w40/{{ row.country|lower }}.png" width="28" height="20" alt="" class="lb-country-flag-lg">
+                                    <span class="lb-country-name">{{ row.country_name }}</span>
+                                </a>
+                            </td>
+                            <td class="lb-num">{{ row.players }}</td>
+                            <td class="lb-num">{{ row.wins }}</td>
+                            <td class="lb-time">{{ row.best_time }}s</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="lb-empty">
+                    <p>{% trans "Пока нет результатов для этой категории." %}</p>
+                    <a href="{% url 'game:index' %}" class="btn btn--primary">{% trans "Начать игру" %}</a>
+                </div>
+                {% endif %}
+            {% elif rows %}
             <table class="lb-table">
                 <thead>
                     <tr>

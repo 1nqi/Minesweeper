@@ -6,8 +6,12 @@ from django.views.decorators.http import require_POST, require_GET
 from . import engine
 from .models import GameResult
 
+RANKED_MODES = ('classic', 'speed')
+
+
 def index(request):
     return render(request, 'game/index.html')
+
 
 @require_POST
 def api_new_game(request):
@@ -22,6 +26,7 @@ def api_new_game(request):
     request.session['game'] = state
     return JsonResponse(engine.get_client_state(state))
 
+
 @require_POST
 def api_reveal(request):
     state = request.session.get('game')
@@ -31,15 +36,17 @@ def api_reveal(request):
     data = json.loads(request.body)
     row, col = data['row'], data['col']
 
-    #chord norm
     if state['revealed'][row][col] and state['board'][row][col] > 0:
         state = engine.chord(state, row, col)
     else:
         state = engine.reveal(state, row, col)
 
+    _auto_save_if_finished(request, state)
+
     request.session['game'] = state
     request.session.modified = True
     return JsonResponse(engine.get_client_state(state))
+
 
 @require_POST
 def api_flag(request):
@@ -63,6 +70,7 @@ def api_state(request):
         request.session['game'] = state
     return JsonResponse(engine.get_client_state(state))
 
+
 @require_POST
 def api_save_result(request):
     state = request.session.get('game')
@@ -70,26 +78,45 @@ def api_save_result(request):
         return JsonResponse({'error': 'No finished game'}, status=400)
 
     data = json.loads(request.body)
-    player_name = data.get('name', 'Аноним')[:50]
-    elapsed = engine.get_elapsed(state)
+    player_name = (data.get('name') or 'Аноним')[:50]
+
+    result_id = state.get('result_id')
+    if result_id:
+        GameResult.objects.filter(id=result_id).update(player_name=player_name)
+        return JsonResponse({'id': result_id, 'saved': True, 'updated': True})
+
+#fallbakc
+    _auto_save_if_finished(request, state, force=True, player_name=player_name)
+    request.session['game'] = state
+    return JsonResponse({'id': state.get('result_id'), 'saved': True})
+
+
+def _auto_save_if_finished(request, state, force=False, player_name=None):
+    #REDO norm
+    if state.get('status') not in ('won', 'lost'):
+        return
+    if state.get('result_id') and not force:
+        return
 
     user = request.user if request.user.is_authenticated else None
+    name = player_name or (user.username if user else 'Аноним')
+    elapsed = engine.get_elapsed(state)
 
     result = GameResult.objects.create(
         user=user,
-        player_name=player_name,
+        player_name=name[:50],
         difficulty=state['difficulty'],
+        mode=state.get('mode', 'classic'),
         rows=state['rows'],
         cols=state['cols'],
         mines=state['mines'],
         result=state['status'],
         time_seconds=elapsed,
     )
+    state['result_id'] = result.id
 
     if user:
         _update_profile_stats(user, state, elapsed)
-
-    return JsonResponse({'id': result.id, 'saved': True})
 
 
 def _update_profile_stats(user, state, elapsed):
@@ -103,26 +130,36 @@ def _update_profile_stats(user, state, elapsed):
         profile.games_won += 1
         fields.append('games_won')
 
-        diff = state['difficulty']
-        best_field = {
-            'beginner': 'best_time_beginner',
-            'intermediate': 'best_time_intermediate',
-            'expert': 'best_time_expert',
-        }.get(diff)
+        if state.get('mode', 'classic') in RANKED_MODES:
+            best_field = {
+                'beginner': 'best_time_beginner',
+                'intermediate': 'best_time_intermediate',
+                'expert': 'best_time_expert',
+            }.get(state['difficulty'])
+            if best_field:
+                current_best = getattr(profile, best_field)
+                if current_best is None or elapsed < current_best:
+                    setattr(profile, best_field, elapsed)
+                    fields.append(best_field)
 
-        if best_field:
-            current_best = getattr(profile, best_field)
-            if current_best is None or elapsed < current_best:
-                setattr(profile, best_field, elapsed)
-                fields.append(best_field)
+        # if state.get('mode', 'classic') in RANKED_MODES:
+        #     best_field = {'beginner': 'best_time_beginner', 'intermediate': 'best_time_intermediate', 'expert': 'best_time_expert',
+        #     }.get(state['difficulty'])
+        #     if best_field:
+        #         current_best = getattr(profile, best_field)
+        #         if current_best is None or elapsed < current_best:
+        #             setattr(profile, best_field, elapsed)
+        #             fields.append(best_field)
+        #     print("123")
 
     profile.save(update_fields=fields)
+
 
 @require_GET
 def api_leaderboard(request):
     difficulty = request.GET.get('difficulty', 'beginner')
     results = GameResult.objects.filter(
-        difficulty=difficulty, result='win'
+        difficulty=difficulty, result='win', mode__in=RANKED_MODES
     ).order_by('time_seconds')[:20]
 
     data = [

@@ -1,8 +1,4 @@
-"""
-Список стран с ISO-кодами. Флаги рендерятся из кода через Unicode Regional Indicators.
-Чтобы добавить страну — просто допиши (код, название) в список.
-"""
-
+#countries ISO for flag render
 from django.utils.translation import gettext_lazy as _
 
 COUNTRY_CHOICES = [

@@ -26,6 +26,8 @@ def profile_detail(request, username):
         user=profile_user
     ).order_by('-created_at')[:20]
 
+    losses = max(0, (profile.games_played or 0) - (profile.games_won or 0))
+
     is_owner = request.user == profile_user
     flair_choices = [(val, label) for val, label in FLAIR_EMOJI_CHOICES if val]
 
@@ -41,6 +43,7 @@ def profile_detail(request, username):
         'flair_choices': flair_choices,
         'flair_categories': FLAIR_CATEGORIES,
         'active_tab': active_tab,
+        'losses': losses,
     })
 
 

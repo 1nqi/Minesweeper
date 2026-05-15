@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.db.models import Min, F, Q
+from django.db.models import Min, Count
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
@@ -16,22 +16,55 @@ DIFF_LABELS = {
     'expert': _('Эксперт'),
 }
 
+RANKED_MODES = ('classic', 'speed')
+
+COUNTRY_NAMES = {code: name for code, name in COUNTRY_CHOICES if code}
+
 
 def leaderboard(request):
     difficulty = request.GET.get('difficulty', 'beginner')
     if difficulty not in DIFFICULTIES:
         difficulty = 'beginner'
 
+    view = request.GET.get('view', 'players')
+    if view not in ('players', 'countries'):
+        view = 'players'
+
     country = request.GET.get('country', '')
 
     base_qs = GameResult.objects.filter(
-        difficulty=difficulty, result='win', user__isnull=False
+        difficulty=difficulty, result='win',
+        mode__in=RANKED_MODES, user__isnull=False,
     ).select_related('user')
 
+    countries_with_results = (
+        UserProfile.objects
+        .filter(country__gt='', user__game_results__result='win',
+                user__game_results__mode__in=RANKED_MODES,
+                user__game_results__difficulty=difficulty)
+        .values_list('country', flat=True)
+        .distinct()
+    )
+    country_set = set(countries_with_results)
+    available_countries = [
+        (code, name) for code, name in COUNTRY_CHOICES
+        if code and code in country_set
+    ]
+
+    if view == 'countries':
+        country_rows = _country_rankings(difficulty)
+        return render(request, 'game/leaderboard.html', {
+            'view': view,
+            'difficulty': difficulty,
+            'current_country': '',
+            'difficulties': [(d, DIFF_LABELS[d]) for d in DIFFICULTIES],
+            'available_countries': available_countries,
+            'country_rows': country_rows,
+            'rows': [],
+        })
+
     if country:
-        user_ids = UserProfile.objects.filter(
-            country=country
-        ).values_list('user_id', flat=True)
+        user_ids = UserProfile.objects.filter(country=country).values_list('user_id', flat=True)
         base_qs = base_qs.filter(user_id__in=user_ids)
 
     best_per_user = (
@@ -64,22 +97,40 @@ def leaderboard(request):
             'time': times_map[uid],
         })
 
-    countries_with_results = (
-        UserProfile.objects
-        .filter(country__gt='', user__game_results__result='win', user__game_results__difficulty=difficulty)
-        .values_list('country', flat=True)
-        .distinct()
-    )
-    country_set = set(countries_with_results)
-    available_countries = [
-        (code, name) for code, name in COUNTRY_CHOICES
-        if code and code in country_set
-    ]
-
     return render(request, 'game/leaderboard.html', {
+        'view': view,
         'rows': rows,
         'difficulty': difficulty,
         'current_country': country,
         'difficulties': [(d, DIFF_LABELS[d]) for d in DIFFICULTIES],
         'available_countries': available_countries,
     })
+
+
+def _country_rankings(difficulty):
+    qs = (
+        GameResult.objects
+        .filter(difficulty=difficulty, result='win',
+                mode__in=RANKED_MODES,
+                user__isnull=False, user__profile__country__gt='')
+        .values('user__profile__country')
+        .annotate(
+            best_time=Min('time_seconds'),
+            wins=Count('id'),
+            players=Count('user_id', distinct=True),
+        )
+        .order_by('best_time')
+    )
+
+    rows = []
+    for i, row in enumerate(qs, start=1):
+        code = row['user__profile__country']
+        rows.append({
+            'rank': i,
+            'country': code,
+            'country_name': COUNTRY_NAMES.get(code, code),
+            'best_time': row['best_time'],
+            'wins': row['wins'],
+            'players': row['players'],
+        })
+    return rows

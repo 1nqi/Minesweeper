@@ -16,12 +16,22 @@ class GameResult(models.Model):
         ('loss', _('Поражение')),
     ]
 
+    MODE_CHOICES = [
+        ('classic', _('Классический')),
+        ('speed', _('Скоростной режим')),
+        ('noflag', _('Без флагов')),
+        ('daily', _('Ежедневный вызов')),
+        ('blind', _('Вслепую')),
+        ('infinite', _('Бесконечный')),
+    ]
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
         null=True, blank=True, related_name='game_results',
     )
     player_name = models.CharField(_('Имя игрока'), max_length=50, default=_('Аноним'))
     difficulty = models.CharField(_('Сложность'), max_length=20, choices=DIFFICULTY_CHOICES)
+    mode = models.CharField(_('Режим'), max_length=20, choices=MODE_CHOICES, default='classic')
     rows = models.PositiveIntegerField(_('Строки'))
     cols = models.PositiveIntegerField(_('Столбцы'))
     mines = models.PositiveIntegerField(_('Мины'))

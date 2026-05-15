@@ -124,6 +124,7 @@
                         <thead>
                             <tr>
                                 <th>{% trans "Сложность" %}</th>
+                                <th>{% trans "Режим" %}</th>
                                 <th>{% trans "Результат" %}</th>
                                 <th>{% trans "Время" %}</th>
                                 <th>{% trans "Дата" %}</th>
@@ -133,6 +134,7 @@
                             {% for g in recent_games %}
                             <tr>
                                 <td>{{ g.get_difficulty_display }}</td>
+                                <td><span class="mode-pill mode-pill--{{ g.mode }}">{{ g.get_mode_display }}</span></td>
                                 <td><span class="result-badge result-badge--{{ g.result }}">{{ g.get_result_display }}</span></td>
                                 <td class="mono">{{ g.time_seconds }}s</td>
                                 <td>{{ g.created_at|date:"M j, Y" }}</td>
@@ -159,6 +161,10 @@
                             <div class="stat-card__label">{% trans "Побед" %}</div>
                         </div>
                         <div class="stat-card">
+                            <div class="stat-card__value">{{ losses }}</div>
+                            <div class="stat-card__label">{% trans "Поражений" %}</div>
+                        </div>
+                        <div class="stat-card">
                             <div class="stat-card__value">{{ profile.win_rate }}%</div>
                             <div class="stat-card__label">{% trans "Процент побед" %}</div>
                         </div>
@@ -183,13 +189,6 @@
                             <div class="sidebar-stat">{{ profile.win_rate }}% {% trans "Процент побед" %}</div>
                         </div>
                     </div>
-
-                    {% if profile.bio %}
-                    <div class="profile-widget">
-                        <h3 class="profile-widget__title">{% trans "О себе" %}</h3>
-                        <p class="profile-widget__text">{{ profile.bio }}</p>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

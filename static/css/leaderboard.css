@@ -26,6 +26,45 @@
     margin: 0;
 }
 
+/* View tabs (Players / Countries) */
+.lb-view-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.lb-view-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #a7a096;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+}
+
+.lb-view-tab svg {
+    opacity: 0.7;
+}
+
+.lb-view-tab:hover {
+    color: #f2f2f1;
+}
+
+.lb-view-tab.is-active {
+    color: #7fa650;
+    border-bottom-color: #7fa650;
+}
+
+.lb-view-tab.is-active svg {
+    opacity: 1;
+}
+
 /* Filters */
 
 .lb-filters {
@@ -223,6 +262,46 @@
     font-weight: 700;
     color: #7fa650;
     font-variant-numeric: tabular-nums;
+}
+
+/* Country leaderboard cell */
+.lb-th-num {
+    text-align: right;
+    width: 90px;
+}
+
+.lb-num {
+    text-align: right;
+    color: #d3cec5;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.lb-country-cell {
+    min-width: 0;
+}
+
+.lb-country-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #f2f2f1;
+    transition: color 0.15s;
+}
+
+.lb-country-link:hover {
+    color: #7fa650;
+}
+
+.lb-country-flag-lg {
+    border-radius: 2px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.lb-country-name {
+    font-weight: 600;
 }
 
 /* Empty state */

@@ -8,7 +8,10 @@ from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
+# В Railway production не читаем .env из образа — иначе подставится локальный SECRET_KEY и приложение упадёт.
+_railway_prod = os.getenv('RAILWAY_ENVIRONMENT') == 'production'
+if not _railway_prod:
+    load_dotenv(BASE_DIR / '.env')
 
 
 def _env_bool(key: str, default: bool = False) -> bool:
@@ -110,11 +113,22 @@ def _csrf_trusted_origins_clean(allowed_hosts: list[str]) -> list[str]:
     return out
 
 
-_railway_prod = os.getenv('RAILWAY_ENVIRONMENT') == 'production'
 _collectstatic = len(sys.argv) > 1 and sys.argv[1] == 'collectstatic'
 
 _secret_env = (os.getenv('SECRET_KEY') or os.getenv('DJANGO_SECRET_KEY') or '').strip()
 DEBUG = _env_bool('DEBUG', False if _railway_prod else True)
+
+if (
+    _secret_env
+    and _secret_env.startswith('django-insecure')
+    and not DEBUG
+    and not _collectstatic
+):
+    raise ImproperlyConfigured(
+        'В продакшене нельзя использовать SECRET_KEY с префиксом django-insecure '
+        '(часто он попадает из .env или шаблона). В Railway задайте Variables → SECRET_KEY: '
+        'python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
+    )
 
 if _secret_env:
     SECRET_KEY = _secret_env

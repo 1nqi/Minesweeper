@@ -9,6 +9,13 @@ from .forms import SignupForm, LoginForm
 
 User = get_user_model()
 
+_MODEL_AUTH_BACKEND = 'django.contrib.auth.backends.ModelBackend'
+
+
+def _login_user(request, user):
+    backend = getattr(user, 'backend', None) or _MODEL_AUTH_BACKEND
+    login(request, user, backend=backend)
+
 
 def home_view(request):
     if request.user.is_authenticated:
@@ -24,7 +31,7 @@ def register_view(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            _login_user(request, user)
             messages.success(request, _('Аккаунт создан. Добро пожаловать!'))
             return redirect('game:index')
     else:
@@ -59,7 +66,7 @@ def login_view(request):
                 user = authenticate(request, username=login_value, password=password)
 
             if user is not None:
-                login(request, user)
+                _login_user(request, user)
                 if not remember_me:
                     request.session.set_expiry(0)
                 messages.success(request, _('Вы вошли в аккаунт.'))

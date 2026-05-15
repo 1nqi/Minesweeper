@@ -114,7 +114,36 @@ python manage.py runserver
 - **python-dotenv** - загрузка `.env`
 - **stripe** - подписка Pro
 - **google-generativeai** - Gemini для текстов подсказок и разборов
+- **gunicorn**, **whitenoise**, **psycopg2-binary**, **dj-database-url** - продакшен-сервер, статика и PostgreSQL (в т.ч. Railway)
 - **requests**, **PyJWT**, **cryptography** - вспомогательные зависимости (OAuth и др.)
+
+## Деплой на Railway
+
+Проект готов к запуску на [Railway](https://railway.app): в репозитории есть `railway.toml` (миграции и `collectstatic` в **Release**, Gunicorn в **Deploy**), `runtime.txt` для версии Python и эндпоинт **GET `/health/`** для проверки здоровья.
+
+### Шаги
+
+1. Создайте проект в Railway и подключите этот репозиторий.
+2. Добавьте плагин **PostgreSQL** — переменная **`DATABASE_URL`** подставится в сервис с приложением автоматически (при связывании БД с веб-сервисом).
+3. В переменных веб-сервиса задайте обязательные прод-значения:
+   - **`SECRET_KEY`** — длинная случайная строка (не используйте dev-значение по умолчанию).
+   - **`ALLOWED_HOSTS`** — публичный домен без схемы, например `your-app.up.railway.app` (можно несколько через запятую).
+   - **`CSRF_TRUSTED_ORIGINS`** — `https://ваш-домен` (схема **https://** обязательна для публичного URL Railway).
+4. Опционально: **`DEBUG`**=`false` (если не задано, при `RAILWAY_ENVIRONMENT=production` отладка уже выключена).
+5. Укажите **Stripe**, **Google OAuth** (разрешённые redirect URI в консоли Google должны включать `https://ваш-домен/accounts/google/login/callback/`), **Gemini** и остальное по таблице ниже.
+6. В Stripe Dashboard добавьте вебхук на URL  
+   **`https://ваш-домен/membership/webhook/`**  
+   и пропишите **`STRIPE_WEBHOOK_SECRET`**.
+7. После деплоя в админке **Sites** (`/admin/sites/site/1/`) укажите **домен и отображаемое имя** сайта как ваш публичный хост (нужно для django-allauth и корректных ссылок).
+
+### Статика и медиа
+
+- **Статика** обслуживается через **WhiteNoise** из `STATIC_ROOT` после `collectstatic` (уже в `releaseCommand`).
+- **Медиа** (аватары и т.п.) по умолчанию пишутся в эфемерную файловую систему контейнера: при перезапуске они могут пропасть. Для постоянного хранения подключите **Railway Volume**, смонтированный в каталог, совпадающий с `MEDIA_ROOT` (или позже вынесите загрузки в объектное хранилище).
+
+### Если база не подключается
+
+- Для облачного Postgres часто нужен SSL: по умолчанию при `DEBUG=false` включён **`DATABASE_SSL_REQUIRE`** (через `dj-database-url`). При локальном Postgres без SSL задайте `DATABASE_SSL_REQUIRE=false`.
 
 ## Переменные окружения (.env)
 
@@ -129,7 +158,9 @@ python manage.py runserver
 | `SITE_ID` | ID сайта в `django.contrib.sites` (часто `1`). |
 | `LANGUAGE_CODE` | Язык по умолчанию, например `ru`. |
 | `TIME_ZONE` | Часовой пояс, например `UTC`. |
-| `USE_POSTGRES` | `true` - использовать PostgreSQL; иначе SQLite. |
+| `DATABASE_URL` | Строка подключения PostgreSQL (**Railway** подставляет при подключении плагина БД). Если задана, используется вместо SQLite и вместо блока `USE_POSTGRES` / `POSTGRES_*`. |
+| `DATABASE_SSL_REQUIRE` | `true` / `false` — требовать SSL к Postgres (по умолчанию `true`, когда `DEBUG=false`). |
+| `USE_POSTGRES` | `true` — PostgreSQL по отдельным переменным `POSTGRES_*` (если **нет** `DATABASE_URL`). |
 | `SQLITE_PATH` | Путь к файлу SQLite относительно корня проекта или абсолютный (по умолчанию `db.sqlite3`). |
 | `POSTGRES_DB` | Имя БД PostgreSQL. |
 | `POSTGRES_USER` | Пользователь PostgreSQL. |
@@ -148,6 +179,10 @@ python manage.py runserver
 | `GEMINI_API_KEY` | Ключ API Google Gemini для текстовых подсказок и разборов. |
 | `GEMINI_MODEL` | ID модели (по умолчанию `gemini-2.0-flash`). |
 | `GEMINI_HINT_EXPLAIN` | `true` / `false` - включить вызовы Gemini для пояснений. |
+| `RAILWAY_ENVIRONMENT` | Выставляется платформой Railway (например `production`); при этом по умолчанию **`DEBUG`** выключается, если явно не задан. |
+| `SECURE_SSL_REDIRECT` | `true` / `false` — редирект HTTP→HTTPS (по умолчанию `true` при `DEBUG=false`). |
+| `LOG_LEVEL` | Уровень лога root-логгера в проде (по умолчанию `INFO`). |
+| `DJANGO_LOG_LEVEL` | Уровень логгера `django` в проде (по умолчанию `INFO`). |
 
 Пример заготовки (значения замените на свои):
 
@@ -159,6 +194,10 @@ CSRF_TRUSTED_ORIGINS=
 SITE_ID=1
 LANGUAGE_CODE=ru
 TIME_ZONE=UTC
+
+# Railway задаёт DATABASE_URL при подключении PostgreSQL; локально можно закомментировать
+# DATABASE_URL=postgres://user:pass@host:5432/dbname
+DATABASE_SSL_REQUIRE=True
 
 USE_POSTGRES=False
 SQLITE_PATH=db.sqlite3
@@ -182,4 +221,8 @@ PRO_TEST_BUTTON=True
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.0-flash
 GEMINI_HINT_EXPLAIN=True
+
+SECURE_SSL_REDIRECT=True
+LOG_LEVEL=INFO
+DJANGO_LOG_LEVEL=INFO
 ```

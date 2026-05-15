@@ -2,6 +2,7 @@ import os
 import secrets
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
@@ -24,8 +25,41 @@ def _env_list(key: str, default=None):
     return [x.strip() for x in val.split(',') if x.strip()]
 
 
+def _public_hostnames_from_env() -> list[str]:
+    """Публичный домен приложения (Railway: RAILWAY_PUBLIC_DOMAIN). Нужен для CSRF при ALLOWED_HOSTS=['*']."""
+    found: list[str] = []
+    seen: set[str] = set()
+
+    def add(raw: str) -> None:
+        raw = raw.strip()
+        if not raw:
+            return
+        if '://' in raw:
+            netloc = urlparse(raw).netloc
+            if not netloc:
+                return
+            host = netloc
+        else:
+            host = raw.split('/')[0].strip()
+        if not host or host in seen:
+            return
+        seen.add(host)
+        found.append(host)
+
+    for key in (
+        'RAILWAY_PUBLIC_DOMAIN',
+        'PUBLIC_HOST',
+        'SITE_HOST',
+        'SITE_URL',
+        'DJANGO_SITE_URL',
+    ):
+        val = os.getenv(key)
+        if val:
+            add(val)
+    return found
+
+
 def _origin_for_allowed_host(host: str) -> str | None:
-    """Собрать доверенный origin из записи ALLOWED_HOSTS (не для '*')."""
     h = host.strip()
     if not h or h == '*':
         return None
@@ -114,6 +148,10 @@ if CSRF_TRUST_ALL_ALLOWED_HOSTS:
     for _o in _origins_from_allowed_hosts(ALLOWED_HOSTS):
         if _o not in _csrf:
             _csrf.append(_o)
+for _h in _public_hostnames_from_env():
+    _o = _origin_for_allowed_host(_h)
+    if _o and _o not in _csrf:
+        _csrf.append(_o)
 if _csrf:
     CSRF_TRUSTED_ORIGINS = _csrf
 

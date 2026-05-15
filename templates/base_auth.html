@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +22,7 @@
 
         <div class="auth-top-bar">
             {% block auth_top_bar %}
-            <a href="{% url 'login' %}" class="auth-top-link">Войти</a>
+            <a href="{% url 'login' %}" class="auth-top-link">{% trans "Войти" %}</a>
             {% endblock %}
         </div>
 

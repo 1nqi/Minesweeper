@@ -1,102 +1,132 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
+{% load profile_tags %}
 
 {% block title %}{{ profile.display_username }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/profile.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 <div class="profile-page">
     <div class="profile-shell">
-        <!-- Header -->
-        <div class="profile-header">
-            <div class="profile-header__avatar">
-                {% if profile.avatar %}
-                <img src="{{ profile.avatar.url }}" alt="" width="96" height="96">
-                {% else %}
-                <div class="profile-header__avatar-placeholder">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
-                </div>
-                {% endif %}
-            </div>
-            <div class="profile-header__info">
-                <div class="profile-header__name-row">
-                    <h1 class="profile-header__name">{{ profile.display_username }}</h1>
-                    {% if profile.flair_emoji %}
-                    <span class="profile-header__flair">{{ profile.flair_emoji }}</span>
-                    {% endif %}
-                </div>
-                {% if profile.status %}
-                <p class="profile-header__status">{{ profile.status }}</p>
-                {% endif %}
-                <div class="profile-header__meta">
-                    <span>Присоединился {{ profile_user.date_joined|date:"d.m.Y" }}</span>
-                    <span>{{ profile.games_played }} игр</span>
-                    {% if profile.is_online_now %}
-                    <span class="profile-header__online">Онлайн</span>
+
+        <div class="profile-header-card">
+            <div class="profile-header-top">
+                <div class="profile-header__avatar-wrap">
+                    {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" alt="" class="profile-header__avatar">
                     {% else %}
-                    <span class="profile-header__offline">Оффлайн</span>
+                    <div class="profile-header__avatar--placeholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="opacity:.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                    </div>
                     {% endif %}
                 </div>
-                {% if is_owner %}
-                <div class="profile-header__actions">
-                    <a href="{% url 'profiles:settings' %}" class="btn btn--dark">Редактировать профиль</a>
+
+                <div class="profile-header-main">
+                    <div class="profile-name-row">
+                        <span class="profile-name">{{ profile.display_username }}</span>
+
+                        {% if profile.country %}
+                        <span class="flag-wrap flag-wrap--with-tooltip">
+                            <img class="flag-wrap__icon" src="https://flagcdn.com/w40/{{ profile.country|lower }}.png" width="24" height="18" alt="{{ profile.country|country_label }}">
+                            <span class="tt">{{ profile.country|country_label }}</span>
+                        </span>
+                        {% endif %}
+
+                        {% if is_owner %}
+                        <span class="profile-flair-wrap" id="flair-trigger">
+                            {% if profile.flair_emoji %}
+                            <span class="profile-flair-inline profile-flair-inline--clickable" id="flair-display">{{ profile.flair_emoji }}</span>
+                            {% else %}
+                            <span class="profile-flair-placeholder" id="flair-display">+</span>
+                            {% endif %}
+                            <span class="tt">{% trans "Выбрать flair" %}</span>
+                        </span>
+                        {% elif profile.flair_emoji %}
+                        <span class="profile-flair-inline">{{ profile.flair_emoji }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-status-row" id="status-row">
+                        {% if is_owner %}
+                        <div class="status-display" id="status-display">
+                            <span class="profile-header__status {% if not profile.status %}profile-header__status--placeholder{% endif %}" id="status-text">{% if profile.status %}{{ profile.status }}{% else %}{% trans "Введите статус" %}{% endif %}</span>
+                            <button class="status-edit-btn" id="status-edit-btn" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span class="tt">{% trans "Изменить статус" %}</span>
+                            </button>
+                        </div>
+                        <div class="status-edit-form" id="status-form">
+                            <input class="status-input" id="status-input" type="text" maxlength="50" placeholder="{% trans 'Введите статус' %}" value="{{ profile.status }}">
+                            <span class="status-counter"><span id="status-counter-num">{{ profile.status|length }}</span>/50</span>
+                        </div>
+                        {% elif profile.status %}
+                        <span class="profile-header__status">{{ profile.status }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-meta-row">
+                        <span><strong>{{ profile_user.date_joined|date:"M j, Y" }}</strong> {% trans "Присоединился" %}</span>
+                        <span>{{ profile.games_played }} {% trans "игр" %}</span>
+                        {% if profile.is_online_now %}
+                        <span class="meta-online">{% trans "Онлайн" %}</span>
+                        {% else %}
+                        <span class="meta-offline">{% trans "Оффлайн" %}</span>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
+
+                <div class="profile-header__actions">
+                    {% if is_owner %}
+                    <a href="{% url 'profiles:settings' %}" class="btn btn--outline">{% trans "Редактировать профиль" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-header-tabs">
+                <a href="?tab=overview" class="profile-tab {% if active_tab == 'overview' %}is-active{% endif %}">{% trans "Обзор" %}</a>
+                <a href="?tab=games" class="profile-tab {% if active_tab == 'games' %}is-active{% endif %}">{% trans "Игры" %}</a>
+                <a href="?tab=stats" class="profile-tab {% if active_tab == 'stats' %}is-active{% endif %}">{% trans "Статистика" %}</a>
             </div>
         </div>
 
-        <!-- Stats + Games -->
         <div class="profile-body-grid">
             <div class="profile-main-column">
-                <!-- Stats cards -->
-                <div class="profile-stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-card__value">{{ profile.games_played }}</div>
-                        <div class="stat-card__label">Игр сыграно</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card__value">{{ profile.games_won }}</div>
-                        <div class="stat-card__label">Побед</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card__value">{{ profile.win_rate }}%</div>
-                        <div class="stat-card__label">Процент побед</div>
-                    </div>
-                </div>
 
-                <!-- Best times -->
+                {% if active_tab == 'overview' or active_tab == 'stats' %}
                 <div class="profile-widget">
-                    <h3 class="profile-widget__title">Лучшее время</h3>
+                    <h3 class="profile-widget__title">{% trans "Лучшее время" %}</h3>
                     <div class="best-times">
                         <div class="best-time">
-                            <span class="best-time__label">Новичок</span>
+                            <span class="best-time__label">{% trans "Новичок" %}</span>
                             <span class="best-time__value">{% if profile.best_time_beginner %}{{ profile.best_time_beginner }}s{% else %}—{% endif %}</span>
                         </div>
                         <div class="best-time">
-                            <span class="best-time__label">Любитель</span>
+                            <span class="best-time__label">{% trans "Любитель" %}</span>
                             <span class="best-time__value">{% if profile.best_time_intermediate %}{{ profile.best_time_intermediate }}s{% else %}—{% endif %}</span>
                         </div>
                         <div class="best-time">
-                            <span class="best-time__label">Эксперт</span>
+                            <span class="best-time__label">{% trans "Эксперт" %}</span>
                             <span class="best-time__value">{% if profile.best_time_expert %}{{ profile.best_time_expert }}s{% else %}—{% endif %}</span>
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
-                <!-- Recent games -->
-                {% if recent_games %}
+                {% if active_tab == 'overview' or active_tab == 'games' %}
                 <div class="profile-widget">
-                    <h3 class="profile-widget__title">Последние игры</h3>
+                    <h3 class="profile-widget__title">{% trans "Последние игры" %} ({{ recent_games|length }})</h3>
+                    {% if recent_games %}
                     <table class="games-table">
                         <thead>
                             <tr>
-                                <th>Сложность</th>
-                                <th>Результат</th>
-                                <th>Время</th>
-                                <th>Дата</th>
+                                <th>{% trans "Сложность" %}</th>
+                                <th>{% trans "Результат" %}</th>
+                                <th>{% trans "Время" %}</th>
+                                <th>{% trans "Дата" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -105,24 +135,211 @@
                                 <td>{{ g.get_difficulty_display }}</td>
                                 <td><span class="result-badge result-badge--{{ g.result }}">{{ g.get_result_display }}</span></td>
                                 <td class="mono">{{ g.time_seconds }}s</td>
-                                <td>{{ g.created_at|date:"d.m.Y" }}</td>
+                                <td>{{ g.created_at|date:"M j, Y" }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% else %}
+                    <p class="profile-widget__muted">{% trans "Пока нет игр. Начните играть!" %}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if active_tab == 'stats' %}
+                <div class="profile-widget">
+                    <h3 class="profile-widget__title">{% trans "Статистика" %}</h3>
+                    <div class="profile-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card__value">{{ profile.games_played }}</div>
+                            <div class="stat-card__label">{% trans "Игр сыграно" %}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__value">{{ profile.games_won }}</div>
+                            <div class="stat-card__label">{% trans "Побед" %}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card__value">{{ profile.win_rate }}%</div>
+                            <div class="stat-card__label">{% trans "Процент побед" %}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if active_tab == 'overview' and profile.bio %}
+                <div class="profile-widget">
+                    <h3 class="profile-widget__title">{% trans "О себе" %}</h3>
+                    <p class="profile-widget__text">{{ profile.bio }}</p>
                 </div>
                 {% endif %}
             </div>
 
             <div class="profile-side-column">
-                {% if profile.bio %}
-                <div class="profile-widget">
-                    <h3 class="profile-widget__title">О себе</h3>
-                    <p class="profile-widget__text">{{ profile.bio }}</p>
+                <div class="profile-sidebar">
+                    <div class="profile-widget">
+                        <h3 class="profile-widget__title">{% trans "Быстрая статистика" %}</h3>
+                        <div class="sidebar-stats">
+                            <div class="sidebar-stat">{{ profile.games_played }} {% trans "игр" %}</div>
+                            <div class="sidebar-stat">{{ profile.win_rate }}% {% trans "Процент побед" %}</div>
+                        </div>
+                    </div>
+
+                    {% if profile.bio %}
+                    <div class="profile-widget">
+                        <h3 class="profile-widget__title">{% trans "О себе" %}</h3>
+                        <p class="profile-widget__text">{{ profile.bio }}</p>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
+        </div>
+
+    </div>
+</div>
+
+{% if is_owner and flair_choices %}
+<div class="flair-modal-overlay" id="flair-overlay">
+    <div class="flair-modal">
+        <div class="flair-modal__header">
+            <span class="flair-modal__username">{{ profile.display_username }}</span>
+            <div class="flair-modal__actions">
+                <button class="flair-modal__remove" id="flair-remove">{% trans "Убрать flair" %}</button>
+                <button class="flair-modal__close" id="flair-close">&times;</button>
+            </div>
+        </div>
+        <div class="flair-modal__body">
+            {% for cat_name, cat_items in flair_categories %}
+            <h4 class="flair-modal__section-title">{{ cat_name }}</h4>
+            <div class="flair-modal__grid">
+                {% for emoji in cat_items %}
+                <button class="flair-modal__option {% if profile.flair_emoji == emoji %}is-selected{% endif %}" data-flair="{{ emoji }}">{{ emoji }}</button>
+                {% endfor %}
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
+
+<meta name="csrf-token-profile" content="{{ csrf_token }}">
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if is_owner %}
+<script>
+(function() {
+    var CSRF = document.querySelector('meta[name="csrf-token-profile"]').content;
+
+    function apiPost(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF},
+            body: JSON.stringify(data)
+        }).then(function(r) { return r.json(); });
+    }
+
+    // --- Flair modal ---
+    var overlay = document.getElementById('flair-overlay');
+    var trigger = document.getElementById('flair-trigger');
+    var flairDisplay = document.getElementById('flair-display');
+
+    if (trigger && overlay) {
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            overlay.classList.add('is-open');
+        });
+
+        document.getElementById('flair-close').addEventListener('click', function() {
+            overlay.classList.remove('is-open');
+        });
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) overlay.classList.remove('is-open');
+        });
+
+        overlay.querySelectorAll('.flair-modal__option').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var flair = btn.getAttribute('data-flair');
+                overlay.querySelectorAll('.flair-modal__option').forEach(function(b) { b.classList.remove('is-selected'); });
+                btn.classList.add('is-selected');
+                apiPost('{% url "profiles:api_update_flair" %}', {flair: flair}).then(function(res) {
+                    if (res.flair) {
+                        flairDisplay.textContent = res.flair;
+                        flairDisplay.className = 'profile-flair-inline profile-flair-inline--clickable';
+                    } else {
+                        flairDisplay.textContent = '+';
+                        flairDisplay.className = 'profile-flair-placeholder';
+                    }
+                    overlay.classList.remove('is-open');
+                });
+            });
+        });
+
+        document.getElementById('flair-remove').addEventListener('click', function() {
+            overlay.querySelectorAll('.flair-modal__option').forEach(function(b) { b.classList.remove('is-selected'); });
+            apiPost('{% url "profiles:api_update_flair" %}', {flair: ''}).then(function() {
+                flairDisplay.textContent = '+';
+                flairDisplay.className = 'profile-flair-placeholder';
+                overlay.classList.remove('is-open');
+            });
+        });
+    }
+
+    // --- Status inline edit ---
+    var statusRow = document.getElementById('status-row');
+    var statusDisplay = document.getElementById('status-display');
+    var statusForm = document.getElementById('status-form');
+    var statusInput = document.getElementById('status-input');
+    var statusText = document.getElementById('status-text');
+    var statusEditBtn = document.getElementById('status-edit-btn');
+    var statusCounter = document.getElementById('status-counter-num');
+
+    if (statusEditBtn) {
+        statusEditBtn.addEventListener('click', function() {
+            statusRow.classList.add('is-editing');
+            statusInput.focus();
+            statusInput.setSelectionRange(statusInput.value.length, statusInput.value.length);
+        });
+
+        statusInput.addEventListener('input', function() {
+            statusCounter.textContent = statusInput.value.length;
+        });
+
+        statusInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveStatus();
+            }
+            if (e.key === 'Escape') {
+                statusRow.classList.remove('is-editing');
+                statusInput.value = statusText.textContent.trim();
+            }
+        });
+
+        statusInput.addEventListener('blur', function() {
+            setTimeout(saveStatus, 150);
+        });
+
+        function saveStatus() {
+            if (!statusRow.classList.contains('is-editing')) return;
+            var val = statusInput.value.trim();
+            apiPost('{% url "profiles:api_update_status" %}', {status: val}).then(function(res) {
+                if (res.status) {
+                    statusText.textContent = res.status;
+                    statusText.classList.remove('profile-header__status--placeholder');
+                } else {
+                    statusText.textContent = '{% trans "Введите статус" %}';
+                    statusText.classList.add('profile-header__status--placeholder');
+                }
+                statusRow.classList.remove('is-editing');
+            });
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay) overlay.classList.remove('is-open');
+    });
+})();
+</script>
+{% endif %}
 {% endblock %}

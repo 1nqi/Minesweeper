@@ -1,0 +1,248 @@
+.lb-page {
+    min-height: 100vh;
+    background: #312e2b;
+    width: 100%;
+}
+
+.lb-shell {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 24px 48px;
+}
+
+.lb-header {
+    margin-bottom: 28px;
+}
+
+.lb-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0 0 6px;
+}
+
+.lb-subtitle {
+    color: #a7a096;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Filters */
+
+.lb-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.lb-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lb-filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a7a096;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: 80px;
+}
+
+.lb-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lb-country-filter {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lb-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: #a7a096;
+    background: #262421;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.lb-pill:hover {
+    background: #2c2926;
+    color: #f2f2f1;
+}
+
+.lb-pill.is-active {
+    background: #7fa650;
+    color: #fff;
+    border-color: #7fa650;
+}
+
+.lb-pill-flag {
+    border-radius: 1px;
+    vertical-align: middle;
+}
+
+/* Table card */
+
+.lb-card {
+    background: #262421;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+    overflow: hidden;
+}
+
+.lb-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.lb-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #a7a096;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: #2c2926;
+}
+
+.lb-th-rank {
+    width: 60px;
+    text-align: center;
+}
+
+.lb-th-time {
+    text-align: right;
+    width: 100px;
+}
+
+.lb-row {
+    transition: background 0.15s;
+}
+
+.lb-row:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.lb-row td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.875rem;
+}
+
+.lb-row:last-child td {
+    border-bottom: none;
+}
+
+/* Top 3 highlight */
+.lb-row--top1 { background: rgba(255,215,0,0.04); }
+.lb-row--top2 { background: rgba(192,192,192,0.03); }
+.lb-row--top3 { background: rgba(205,127,50,0.03); }
+
+.lb-rank {
+    text-align: center;
+    font-weight: 700;
+    color: #a7a096;
+    width: 60px;
+}
+
+.lb-medal {
+    font-size: 1.25rem;
+}
+
+/* Player cell */
+.lb-player-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #f2f2f1;
+    transition: color 0.15s;
+}
+
+.lb-player-link:hover {
+    color: #7fa650;
+}
+
+.lb-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 3px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.lb-avatar--placeholder {
+    background: #2c2926;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a7a096;
+}
+
+.lb-player-name {
+    font-weight: 600;
+}
+
+.lb-flair {
+    font-size: 1rem;
+}
+
+/* Country cell */
+.lb-country {
+    width: 60px;
+}
+
+.lb-flag {
+    border-radius: 1px;
+    vertical-align: middle;
+}
+
+.lb-no-country {
+    color: #a7a096;
+}
+
+/* Time cell */
+.lb-time {
+    text-align: right;
+    font-weight: 700;
+    color: #7fa650;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Empty state */
+.lb-empty {
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.lb-empty p {
+    color: #a7a096;
+    font-size: 0.9rem;
+    margin: 0 0 16px;
+}
+
+@media (max-width: 600px) {
+    .lb-filter-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .lb-filter-label {
+        min-width: auto;
+    }
+}

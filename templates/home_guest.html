@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Играй в Сапёр онлайн{% endblock %}
+{% block title %}{% trans "Играй в Сапёр онлайн" %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
@@ -19,9 +20,9 @@
         </div>
     </div>
     <div class="hero-content">
-        <h1 class="hero-title">Играй в Сапёр онлайн</h1>
-        <p class="hero-subtitle">Присоединяйся к игрокам со всего мира. Побей рекорды. Стань лучшим.</p>
-        <a href="{% url 'register' %}" class="btn btn--primary btn--lg">Начать игру</a>
+        <h1 class="hero-title">{% trans "Играй в Сапёр онлайн" %}</h1>
+        <p class="hero-subtitle">{% trans "Присоединяйся к игрокам со всего мира. Побей рекорды. Стань лучшим." %}</p>
+        <a href="{% url 'register' %}" class="btn btn--primary btn--lg">{% trans "Начать игру" %}</a>
     </div>
 </div>
 {% endblock %}

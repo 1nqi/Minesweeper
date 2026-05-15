@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Играть{% endblock %}
+{% block title %}{% trans "Играть" %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'game/css/style.css' %}">
@@ -16,14 +17,14 @@
                     <div class="game-topbar__left">
                         <div class="diff-dropdown">
                             <button class="diff-dropdown__btn" id="diff-dropdown-btn">
-                                <span id="diff-current-label">Новичок</span>
+                                <span id="diff-current-label">{% trans "Новичок" %}</span>
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                             </button>
                             <div class="diff-dropdown__menu" id="diff-dropdown-menu">
-                                <button class="diff-dropdown__item active" data-diff="beginner">Новичок <span>9×9 · 10</span></button>
-                                <button class="diff-dropdown__item" data-diff="intermediate">Любитель <span>16×16 · 40</span></button>
-                                <button class="diff-dropdown__item" data-diff="expert">Эксперт <span>16×30 · 99</span></button>
-                                <button class="diff-dropdown__item" data-diff="custom" id="btn-custom">Своя игра <span>...</span></button>
+                                <button class="diff-dropdown__item active" data-diff="beginner">{% trans "Новичок" %} <span>9×9 · 10</span></button>
+                                <button class="diff-dropdown__item" data-diff="intermediate">{% trans "Любитель" %} <span>16×16 · 40</span></button>
+                                <button class="diff-dropdown__item" data-diff="expert">{% trans "Эксперт" %} <span>16×30 · 99</span></button>
+                                <button class="diff-dropdown__item" data-diff="custom" id="btn-custom">{% trans "Своя игра" %} <span>...</span></button>
                             </div>
                         </div>
                     </div>
@@ -46,7 +47,8 @@
                         </div>
                     </div>
                     <div class="game-topbar__right">
-                        <button class="topbar-icon-btn" id="btn-restart" title="Новая игра">
+                        <span class="mode-badge" id="mode-badge" style="display:none"></span>
+                        <button class="topbar-icon-btn" id="btn-restart" title="{% trans 'Новая игра' %}">
                             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M17.65 6.35A8 8 0 1019 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 2v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
                     </div>
@@ -58,29 +60,37 @@
 
             <div class="game-banner hidden" id="game-banner">
                 <span class="banner-text" id="banner-text"></span>
-                <button class="banner-btn" id="banner-new-game">Новая игра</button>
+                <button class="banner-btn" id="banner-new-game">{% trans "Новая игра" %}</button>
+            </div>
+
+            <div class="daily-info" id="daily-info" style="display:none">
+                <div class="daily-info__icon">📅</div>
+                <div class="daily-info__text">
+                    <span class="daily-info__title" id="daily-title"></span>
+                    <span class="daily-info__desc" id="daily-desc"></span>
+                </div>
             </div>
         </div>
 
         <div class="side-panel">
             <div class="panel-card">
-                <h3 class="panel-title">Управление</h3>
-                <div class="panel-hint"><kbd>ЛКМ</kbd> Открыть клетку</div>
-                <div class="panel-hint"><kbd>ПКМ</kbd> Поставить флаг</div>
-                <div class="panel-hint"><kbd>СКМ</kbd> Chord (открыть соседей)</div>
+                <h3 class="panel-title">{% trans "Управление" %}</h3>
+                <div class="panel-hint"><kbd>{% trans "ЛКМ" %}</kbd> {% trans "Открыть клетку" %}</div>
+                <div class="panel-hint"><kbd>{% trans "ПКМ" %}</kbd> {% trans "Поставить флаг" %}</div>
+                <div class="panel-hint"><kbd>{% trans "СКМ" %}</kbd> {% trans "Chord (открыть соседей)" %}</div>
             </div>
             <div class="panel-card">
-                <h3 class="panel-title">Статус</h3>
-                <div class="panel-status" id="panel-status">Готов к игре</div>
+                <h3 class="panel-title">{% trans "Статус" %}</h3>
+                <div class="panel-status" id="panel-status">{% trans "Готов к игре" %}</div>
             </div>
             <div class="panel-card">
-                <h3 class="panel-title">Тема доски</h3>
+                <h3 class="panel-title">{% trans "Тема доски" %}</h3>
                 <div class="theme-picker" id="theme-picker">
-                    <div class="theme-swatch active" data-theme="classic" title="Классика"></div>
-                    <div class="theme-swatch" data-theme="ocean" title="Океан"></div>
-                    <div class="theme-swatch" data-theme="desert" title="Пустыня"></div>
-                    <div class="theme-swatch" data-theme="night" title="Ночь"></div>
-                    <div class="theme-swatch" data-theme="candy" title="Конфеты"></div>
+                    <div class="theme-swatch active" data-theme="classic" title="{% trans 'Классика' %}"></div>
+                    <div class="theme-swatch" data-theme="ocean" title="{% trans 'Океан' %}"></div>
+                    <div class="theme-swatch" data-theme="desert" title="{% trans 'Пустыня' %}"></div>
+                    <div class="theme-swatch" data-theme="night" title="{% trans 'Ночь' %}"></div>
+                    <div class="theme-swatch" data-theme="candy" title="{% trans 'Конфеты' %}"></div>
                 </div>
             </div>
         </div>
@@ -90,25 +100,25 @@
 <div class="modal-overlay" id="custom-modal">
     <div class="modal">
         <div class="modal-header">
-            <h2>Своя игра</h2>
+            <h2>{% trans "Своя игра" %}</h2>
             <button class="modal-close" id="custom-cancel">&times;</button>
         </div>
         <div class="modal-body">
             <div class="field-group">
-                <label for="custom-rows">Строки</label>
+                <label for="custom-rows">{% trans "Строки" %}</label>
                 <input type="number" id="custom-rows" value="16" min="5" max="30">
             </div>
             <div class="field-group">
-                <label for="custom-cols">Столбцы</label>
+                <label for="custom-cols">{% trans "Столбцы" %}</label>
                 <input type="number" id="custom-cols" value="16" min="5" max="50">
             </div>
             <div class="field-group">
-                <label for="custom-mines">Мины</label>
+                <label for="custom-mines">{% trans "Мины" %}</label>
                 <input type="number" id="custom-mines" value="40" min="1" max="500">
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-green" id="custom-start">Начать</button>
+            <button class="btn-green" id="custom-start">{% trans "Начать" %}</button>
         </div>
     </div>
 </div>
@@ -116,26 +126,50 @@
 <div class="modal-overlay" id="win-modal">
     <div class="modal">
         <div class="modal-header">
-            <h2>Победа!</h2>
+            <h2>{% trans "Победа!" %}</h2>
             <button class="modal-close" id="win-skip">&times;</button>
         </div>
         <div class="modal-body">
             <div class="win-stats">
                 <span class="win-time-value" id="win-time">0.0</span>
-                <span class="win-time-label">секунд</span>
+                <span class="win-time-label">{% trans "секунд" %}</span>
             </div>
             <div class="field-group">
-                <label for="win-name">Ваше имя</label>
-                <input type="text" id="win-name" value="{% if user.is_authenticated %}{{ user.username }}{% else %}Аноним{% endif %}" maxlength="50">
+                <label for="win-name">{% trans "Ваше имя" %}</label>
+                <input type="text" id="win-name" value="{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans 'Аноним' %}{% endif %}" maxlength="50">
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-green" id="win-save">Сохранить результат</button>
+            <button class="btn-green" id="win-save">{% trans "Сохранить результат" %}</button>
         </div>
     </div>
 </div>
 
 <meta name="csrf-token" content="{{ csrf_token }}">
+
+<script>
+window.MS_I18N = {
+    beginner: "{% trans 'Новичок' %}",
+    intermediate: "{% trans 'Любитель' %}",
+    expert: "{% trans 'Эксперт' %}",
+    custom: "{% trans 'Своя игра' %}",
+    ready: "{% trans 'Готов к игре' %}",
+    playing: "{% trans 'Игра идёт...' %}",
+    won: "{% trans 'Вы победили!' %}",
+    lost: "{% trans 'Игра проиграна' %}",
+    winBanner: "{% trans 'Победа! Время:' %}",
+    lossBanner: "{% trans 'Игра окончена — мина!' %}",
+    anonymous: "{% trans 'Аноним' %}",
+    modeClassic: "{% trans 'Классический' %}",
+    modeSpeed: "{% trans 'Скоростной режим' %}",
+    modeNoflag: "{% trans 'Без флагов' %}",
+    modeDaily: "{% trans 'Ежедневный вызов' %}",
+    modeBlind: "{% trans 'Вслепую' %}",
+    modeInfinite: "{% trans 'Бесконечный' %}",
+    dailyTitle: "{% trans 'Ежедневный вызов' %}",
+    dailyDesc: "{% trans 'У всех игроков одинаковое поле. Покажи лучшее время!' %}"
+};
+</script>
 {% endblock %}
 
 {% block extra_js %}

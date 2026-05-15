@@ -571,3 +571,56 @@
 @media (max-width: 480px) {
     .game-layout { padding: 8px; }
 }
+
+/* Daily info bar */
+.daily-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 12px;
+    padding: 14px 18px;
+    background: #262421;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    max-width: 480px;
+}
+
+.daily-info__icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.daily-info__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.daily-info__title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #f2f2f1;
+}
+
+.daily-info__desc {
+    font-size: 0.8125rem;
+    color: #a7a096;
+    line-height: 1.35;
+}
+
+/* Mode badge */
+.mode-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(127,166,80,0.15);
+    color: #7fa650;
+    white-space: nowrap;
+}
+
+/* Blind mode fade */
+.cell-blind-fade {
+    color: transparent !important;
+    transition: color 0.8s ease;
+}

@@ -1,14 +1,18 @@
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 
+from .countries import COUNTRY_CHOICES, country_flag
+
 ONLINE_WINDOW = timedelta(minutes=5)
+
+LANGUAGE_CHOICES = [(code, name) for code, name in django_settings.LANGUAGES]
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+        django_settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='profile',
     )
@@ -17,6 +21,8 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True, max_length=200)
     status = models.CharField(max_length=120, blank=True)
     flair_emoji = models.CharField(max_length=16, blank=True)
+    country = models.CharField(max_length=2, blank=True, choices=COUNTRY_CHOICES)
+    language = models.CharField(max_length=10, blank=True, default='ru', choices=LANGUAGE_CHOICES)
 
     is_online = models.BooleanField(default=False)
     last_seen = models.DateTimeField(blank=True, null=True)
@@ -39,6 +45,10 @@ class UserProfile(models.Model):
     @property
     def display_username(self):
         return self.display_name.strip() or self.user.username
+
+    @property
+    def flag_emoji(self):
+        return country_flag(self.country)
 
     @property
     def win_rate(self):

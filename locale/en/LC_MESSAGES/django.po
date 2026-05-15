@@ -1,0 +1,568 @@
+# English translations for MineSweeper
+# Copyright (C) 2026
+# This file is distributed under the same license as the MineSweeper package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MineSweeper 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-15 12:00+0500\n"
+"PO-Revision-Date: 2026-05-15 12:00+0500\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# --- Navigation ---
+
+msgid "Играть"
+msgstr "Play"
+
+msgid "Рекорды"
+msgstr "Records"
+
+msgid "Настройки"
+msgstr "Settings"
+
+msgid "Выйти"
+msgstr "Log out"
+
+msgid "Регистрация"
+msgstr "Sign up"
+
+msgid "Войти"
+msgstr "Log in"
+
+# --- Home ---
+
+msgid "Играй в Сапёр онлайн"
+msgstr "Play Minesweeper Online"
+
+msgid "Присоединяйся к игрокам со всего мира. Побей рекорды. Стань лучшим."
+msgstr "Join players from around the world. Break records. Be the best."
+
+msgid "Начать игру"
+msgstr "Start Game"
+
+# --- Auth ---
+
+msgid "Вход"
+msgstr "Log in"
+
+msgid "На главную"
+msgstr "Home"
+
+msgid "Войти через Google"
+msgstr "Log in with Google"
+
+msgid "или"
+msgstr "or"
+
+msgid "Запомнить меня"
+msgstr "Remember me"
+
+msgid "Впервые здесь?"
+msgstr "First time here?"
+
+msgid "Зарегистрируйтесь"
+msgstr "Sign up"
+
+msgid "Создайте аккаунт"
+msgstr "Create an account"
+
+msgid "Регистрация через Google"
+msgstr "Sign up with Google"
+
+msgid "Зарегистрироваться"
+msgstr "Sign up"
+
+msgid "Уже есть аккаунт?"
+msgstr "Already have an account?"
+
+msgid "Войдите"
+msgstr "Log in"
+
+# --- Game ---
+
+msgid "Новичок"
+msgstr "Beginner"
+
+msgid "Любитель"
+msgstr "Intermediate"
+
+msgid "Эксперт"
+msgstr "Expert"
+
+msgid "Своя игра"
+msgstr "Custom"
+
+msgid "Новая игра"
+msgstr "New Game"
+
+msgid "Управление"
+msgstr "Controls"
+
+msgid "ЛКМ"
+msgstr "LMB"
+
+msgid "Открыть клетку"
+msgstr "Reveal cell"
+
+msgid "ПКМ"
+msgstr "RMB"
+
+msgid "Поставить флаг"
+msgstr "Place flag"
+
+msgid "СКМ"
+msgstr "MMB"
+
+msgid "Chord (открыть соседей)"
+msgstr "Chord (reveal neighbors)"
+
+msgid "Статус"
+msgstr "Status"
+
+msgid "Готов к игре"
+msgstr "Ready to play"
+
+msgid "Тема доски"
+msgstr "Board Theme"
+
+msgid "Классика"
+msgstr "Classic"
+
+msgid "Океан"
+msgstr "Ocean"
+
+msgid "Пустыня"
+msgstr "Desert"
+
+msgid "Ночь"
+msgstr "Night"
+
+msgid "Конфеты"
+msgstr "Candy"
+
+msgid "Строки"
+msgstr "Rows"
+
+msgid "Столбцы"
+msgstr "Columns"
+
+msgid "Мины"
+msgstr "Mines"
+
+msgid "Начать"
+msgstr "Start"
+
+msgid "Победа!"
+msgstr "Victory!"
+
+msgid "секунд"
+msgstr "seconds"
+
+msgid "Ваше имя"
+msgstr "Your name"
+
+msgid "Аноним"
+msgstr "Anonymous"
+
+msgid "Сохранить результат"
+msgstr "Save result"
+
+msgid "Игра идёт..."
+msgstr "Playing..."
+
+msgid "Вы победили!"
+msgstr "You won!"
+
+msgid "Игра проиграна"
+msgstr "Game lost"
+
+msgid "Победа! Время:"
+msgstr "Victory! Time:"
+
+msgid "Игра окончена — мина!"
+msgstr "Game over — mine!"
+
+# --- Profile ---
+
+msgid "Присоединился"
+msgstr "Joined"
+
+msgid "игр"
+msgstr "games"
+
+msgid "Онлайн"
+msgstr "Online"
+
+msgid "Оффлайн"
+msgstr "Offline"
+
+msgid "Редактировать профиль"
+msgstr "Edit profile"
+
+msgid "Игр сыграно"
+msgstr "Games played"
+
+msgid "Побед"
+msgstr "Wins"
+
+msgid "Процент побед"
+msgstr "Win rate"
+
+msgid "Лучшее время"
+msgstr "Best time"
+
+msgid "Последние игры"
+msgstr "Recent games"
+
+msgid "Сложность"
+msgstr "Difficulty"
+
+msgid "Результат"
+msgstr "Result"
+
+msgid "Время"
+msgstr "Time"
+
+msgid "Дата"
+msgstr "Date"
+
+msgid "О себе"
+msgstr "About"
+
+# --- Settings ---
+
+msgid "Настройки профиля"
+msgstr "Profile Settings"
+
+msgid "Редактируйте свой профиль. Всё здесь будет видно другим игрокам."
+msgstr "Edit your profile. Everything here will be visible to other players."
+
+msgid "Изменить аватар"
+msgstr "Change avatar"
+
+msgid "Отображаемое имя"
+msgstr "Display name"
+
+msgid "Короткий статус"
+msgstr "Short status"
+
+msgid "Расскажите о себе"
+msgstr "Tell about yourself"
+
+msgid "Страна"
+msgstr "Country"
+
+msgid "Язык"
+msgstr "Language"
+
+msgid "Сохранить"
+msgstr "Save"
+
+msgid "Отмена"
+msgstr "Cancel"
+
+# --- Python messages ---
+
+msgid "Аккаунт создан. Добро пожаловать!"
+msgstr "Account created. Welcome!"
+
+msgid "Вы вошли в аккаунт."
+msgstr "You have logged in."
+
+msgid "Неверное имя пользователя или пароль."
+msgstr "Invalid username or password."
+
+msgid "Исправьте ошибки ниже."
+msgstr "Please fix the errors below."
+
+msgid "Вы вышли из аккаунта."
+msgstr "You have logged out."
+
+msgid "Профиль обновлён."
+msgstr "Profile updated."
+
+msgid "Изображение должно быть меньше 5 МБ."
+msgstr "Image must be less than 5 MB."
+
+# --- Model fields ---
+
+msgid "Имя игрока"
+msgstr "Player name"
+
+msgid "Время (сек)"
+msgstr "Time (sec)"
+
+msgid "Результат игры"
+msgstr "Game result"
+
+msgid "Результаты игр"
+msgstr "Game results"
+
+msgid "Свой"
+msgstr "Custom"
+
+msgid "Победа"
+msgstr "Win"
+
+msgid "Поражение"
+msgstr "Loss"
+
+msgid "Обзор"
+msgstr "Overview"
+
+msgid "Игры"
+msgstr "Games"
+
+msgid "Статистика"
+msgstr "Stats"
+
+msgid "Быстрая статистика"
+msgstr "Quick stats"
+
+msgid "Выбрать flair"
+msgstr "Choose flair"
+
+msgid "Убрать flair"
+msgstr "Remove flair"
+
+msgid "Введите статус"
+msgstr "Enter a status here"
+
+msgid "Изменить статус"
+msgstr "Edit status"
+
+msgid "Пока нет игр. Начните играть!"
+msgstr "No games yet. Start playing!"
+
+msgid "Лучшие результаты игроков со всего мира"
+msgstr "Best results from players around the world"
+
+msgid "Все страны"
+msgstr "All countries"
+
+msgid "Игрок"
+msgstr "Player"
+
+msgid "Пока нет результатов для этой категории."
+msgstr "No results for this category yet."
+
+msgid "Профиль"
+msgstr "Profile"
+
+msgid "Внешний вид"
+msgstr "Appearance"
+
+msgid "Аккаунт"
+msgstr "Account"
+
+msgid "Публичный профиль"
+msgstr "Public Profile"
+
+msgid "Настройте интерфейс под себя."
+msgstr "Customize the interface to your preferences."
+
+msgid "Тему доски можно изменить прямо на странице игры."
+msgstr "You can change the board theme on the game page."
+
+msgid "Управление аккаунтом."
+msgstr "Account management."
+
+msgid "Имя пользователя"
+msgstr "Username"
+
+msgid "Дата регистрации"
+msgstr "Registration date"
+
+msgid "Выйти из аккаунта"
+msgstr "Log out"
+
+msgid "Изменить"
+msgstr "Change"
+
+# --- Play menu modes ---
+
+msgid "Классический"
+msgstr "Classic"
+
+msgid "Обычный сапёр — выбери сложность и играй"
+msgstr "Standard minesweeper — pick difficulty and play"
+
+msgid "Скоростной режим"
+msgstr "Speed Run"
+
+msgid "Открой все клетки как можно быстрее"
+msgstr "Clear the board as fast as you can"
+
+msgid "Без флагов"
+msgstr "No Flags"
+
+msgid "Пройди уровень не используя флаги"
+msgstr "Complete the level without using flags"
+
+msgid "Ежедневный вызов"
+msgstr "Daily Challenge"
+
+msgid "Одно поле в день — сравни результат с другими"
+msgstr "One board per day — compare your result with others"
+
+msgid "Вслепую"
+msgstr "Blind Mode"
+
+msgid "Числа исчезают через 2 секунды — запоминай!"
+msgstr "Numbers disappear after 2 seconds — memorize!"
+
+msgid "Бесконечный"
+msgstr "Infinite"
+
+msgid "Поле расширяется — играй пока не проиграешь"
+msgstr "The board expands — play until you lose"
+
+msgid "У всех игроков одинаковое поле. Покажи лучшее время!"
+msgstr "All players get the same board. Show your best time!"
+
+# --- Countries ---
+
+msgid "— Не указана —"
+msgstr "— Not specified —"
+
+msgid "Казахстан"
+msgstr "Kazakhstan"
+
+msgid "Россия"
+msgstr "Russia"
+
+msgid "Украина"
+msgstr "Ukraine"
+
+msgid "Узбекистан"
+msgstr "Uzbekistan"
+
+msgid "Кыргызстан"
+msgstr "Kyrgyzstan"
+
+msgid "Таджикистан"
+msgstr "Tajikistan"
+
+msgid "Туркменистан"
+msgstr "Turkmenistan"
+
+msgid "Азербайджан"
+msgstr "Azerbaijan"
+
+msgid "Грузия"
+msgstr "Georgia"
+
+msgid "Армения"
+msgstr "Armenia"
+
+msgid "Беларусь"
+msgstr "Belarus"
+
+msgid "Молдова"
+msgstr "Moldova"
+
+msgid "США"
+msgstr "USA"
+
+msgid "Великобритания"
+msgstr "United Kingdom"
+
+msgid "Германия"
+msgstr "Germany"
+
+msgid "Франция"
+msgstr "France"
+
+msgid "Италия"
+msgstr "Italy"
+
+msgid "Испания"
+msgstr "Spain"
+
+msgid "Португалия"
+msgstr "Portugal"
+
+msgid "Нидерланды"
+msgstr "Netherlands"
+
+msgid "Бельгия"
+msgstr "Belgium"
+
+msgid "Польша"
+msgstr "Poland"
+
+msgid "Чехия"
+msgstr "Czech Republic"
+
+msgid "Швеция"
+msgstr "Sweden"
+
+msgid "Норвегия"
+msgstr "Norway"
+
+msgid "Финляндия"
+msgstr "Finland"
+
+msgid "Дания"
+msgstr "Denmark"
+
+msgid "Австрия"
+msgstr "Austria"
+
+msgid "Швейцария"
+msgstr "Switzerland"
+
+msgid "Турция"
+msgstr "Turkey"
+
+msgid "Китай"
+msgstr "China"
+
+msgid "Япония"
+msgstr "Japan"
+
+msgid "Южная Корея"
+msgstr "South Korea"
+
+msgid "Индия"
+msgstr "India"
+
+msgid "Бразилия"
+msgstr "Brazil"
+
+msgid "Аргентина"
+msgstr "Argentina"
+
+msgid "Мексика"
+msgstr "Mexico"
+
+msgid "Канада"
+msgstr "Canada"
+
+msgid "Австралия"
+msgstr "Australia"
+
+msgid "Новая Зеландия"
+msgstr "New Zealand"
+
+msgid "Египет"
+msgstr "Egypt"
+
+msgid "ЮАР"
+msgstr "South Africa"
+
+msgid "Саудовская Аравия"
+msgstr "Saudi Arabia"
+
+msgid "ОАЭ"
+msgstr "UAE"
+
+msgid "Израиль"
+msgstr "Israel"

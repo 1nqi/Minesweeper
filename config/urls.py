@@ -2,15 +2,20 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 
 from accounts.views import home_view
+from game.views_leaderboard import leaderboard as leaderboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('', home_view, name='home'),
     path('', include('accounts.urls')),
     path('', include('profiles.urls')),
     path('play/', include('game.urls')),
+    path('leaderboard/', leaderboard_view, name='leaderboard'),
+    path('i18n/', include('django.conf.urls.i18n')),
 ]
 
 if settings.DEBUG:

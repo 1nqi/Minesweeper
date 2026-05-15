@@ -16,8 +16,9 @@ def api_new_game(request):
     rows = data.get('rows')
     cols = data.get('cols')
     mines = data.get('mines')
+    mode = data.get('mode', 'classic')
 
-    state = engine.create_game(difficulty, rows, cols, mines)
+    state = engine.create_game(difficulty, rows, cols, mines, mode=mode)
     request.session['game'] = state
     return JsonResponse(engine.get_client_state(state))
 
@@ -70,18 +71,52 @@ def api_save_result(request):
 
     data = json.loads(request.body)
     player_name = data.get('name', 'Аноним')[:50]
+    elapsed = engine.get_elapsed(state)
+
+    user = request.user if request.user.is_authenticated else None
 
     result = GameResult.objects.create(
+        user=user,
         player_name=player_name,
         difficulty=state['difficulty'],
         rows=state['rows'],
         cols=state['cols'],
         mines=state['mines'],
         result=state['status'],
-        time_seconds=engine.get_elapsed(state),
+        time_seconds=elapsed,
     )
 
+    if user:
+        _update_profile_stats(user, state, elapsed)
+
     return JsonResponse({'id': result.id, 'saved': True})
+
+
+def _update_profile_stats(user, state, elapsed):
+    from profiles.models import UserProfile
+    profile, _created = UserProfile.objects.get_or_create(user=user)
+
+    profile.games_played += 1
+    fields = ['games_played']
+
+    if state['status'] == 'won':
+        profile.games_won += 1
+        fields.append('games_won')
+
+        diff = state['difficulty']
+        best_field = {
+            'beginner': 'best_time_beginner',
+            'intermediate': 'best_time_intermediate',
+            'expert': 'best_time_expert',
+        }.get(diff)
+
+        if best_field:
+            current_best = getattr(profile, best_field)
+            if current_best is None or elapsed < current_best:
+                setattr(profile, best_field, elapsed)
+                fields.append(best_field)
+
+    profile.save(update_fields=fields)
 
 @require_GET
 def api_leaderboard(request):

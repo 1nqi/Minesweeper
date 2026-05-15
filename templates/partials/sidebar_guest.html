@@ -1,21 +1,69 @@
+{% load i18n %}
 <aside class="sidebar">
     <div class="sidebar__logo">
         <a href="{% url 'home' %}">Mine<span class="sidebar__logo-accent">Sweeper</span>.com</a>
     </div>
 
     <nav class="sidebar__nav">
-        <a href="{% url 'game:index' %}" class="sidebar__nav-item is-active">
-            <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M4 6l8 5 8-5v11H4V6z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="2" fill="currentColor"/></svg>
-            <span>Играть</span>
-        </a>
-        <a href="#" class="sidebar__nav-item">
+        <div class="sidebar__nav-flyout-wrap">
+            <a href="{% url 'game:index' %}" class="sidebar__nav-item is-active">
+                <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M4 6l8 5 8-5v11H4V6z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="2" fill="currentColor"/></svg>
+                <span>{% trans "Играть" %}</span>
+            </a>
+            <div class="sidebar__flyout">
+                <a href="{% url 'game:index' %}?mode=classic" class="sidebar__flyout-item">
+                    <span class="sidebar__flyout-icon">💣</span>
+                    <div class="sidebar__flyout-text">
+                        <span class="sidebar__flyout-title">{% trans "Классический" %}</span>
+                        <span class="sidebar__flyout-desc">{% trans "Обычный сапёр — выбери сложность и играй" %}</span>
+                    </div>
+                </a>
+                <a href="{% url 'game:index' %}?mode=speed" class="sidebar__flyout-item">
+                    <span class="sidebar__flyout-icon">⚡</span>
+                    <div class="sidebar__flyout-text">
+                        <span class="sidebar__flyout-title">{% trans "Скоростной режим" %}</span>
+                        <span class="sidebar__flyout-desc">{% trans "Открой все клетки как можно быстрее" %}</span>
+                    </div>
+                </a>
+                <a href="{% url 'game:index' %}?mode=noflag" class="sidebar__flyout-item">
+                    <span class="sidebar__flyout-icon">🚫</span>
+                    <div class="sidebar__flyout-text">
+                        <span class="sidebar__flyout-title">{% trans "Без флагов" %}</span>
+                        <span class="sidebar__flyout-desc">{% trans "Пройди уровень не используя флаги" %}</span>
+                    </div>
+                </a>
+                <div class="sidebar__flyout-divider"></div>
+                <a href="{% url 'game:index' %}?mode=daily" class="sidebar__flyout-item">
+                    <span class="sidebar__flyout-icon">📅</span>
+                    <div class="sidebar__flyout-text">
+                        <span class="sidebar__flyout-title">{% trans "Ежедневный вызов" %}</span>
+                        <span class="sidebar__flyout-desc">{% trans "Одно поле в день — сравни результат с другими" %}</span>
+                    </div>
+                </a>
+                <a href="{% url 'game:index' %}?mode=blind" class="sidebar__flyout-item">
+                    <span class="sidebar__flyout-icon">🙈</span>
+                    <div class="sidebar__flyout-text">
+                        <span class="sidebar__flyout-title">{% trans "Вслепую" %}</span>
+                        <span class="sidebar__flyout-desc">{% trans "Числа исчезают через 2 секунды — запоминай!" %}</span>
+                    </div>
+                </a>
+                <a href="{% url 'game:index' %}?mode=infinite" class="sidebar__flyout-item">
+                    <span class="sidebar__flyout-icon">♾️</span>
+                    <div class="sidebar__flyout-text">
+                        <span class="sidebar__flyout-title">{% trans "Бесконечный" %}</span>
+                        <span class="sidebar__flyout-desc">{% trans "Поле расширяется — играй пока не проиграешь" %}</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <a href="{% url 'leaderboard' %}" class="sidebar__nav-item">
             <svg class="sidebar__nav-icon" viewBox="0 0 24 24" fill="none"><path d="M3 20h4v-8H3v8zm6 0h4V9H9v11zm6 0h4V4h-4v16z" fill="currentColor"/></svg>
-            <span>Рекорды</span>
+            <span>{% trans "Рекорды" %}</span>
         </a>
     </nav>
 
     <div class="sidebar__bottom">
-        <a href="{% url 'register' %}" class="sidebar__btn sidebar__btn--primary">Регистрация</a>
-        <a href="{% url 'login' %}" class="sidebar__btn sidebar__btn--dark">Войти</a>
+        <a href="{% url 'register' %}" class="sidebar__btn sidebar__btn--primary">{% trans "Регистрация" %}</a>
+        <a href="{% url 'login' %}" class="sidebar__btn sidebar__btn--dark">{% trans "Войти" %}</a>
     </div>
 </aside>

@@ -1,82 +1,250 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
+{% load profile_tags %}
 
-{% block title %}Настройки профиля{% endblock %}
+{% block title %}{% trans "Настройки профиля" %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/settings.css' %}?v=1">
 {% endblock %}
 
 {% block content %}
 <div class="settings-page">
     <div class="settings-shell">
-        <h1 class="settings-title">Настройки профиля</h1>
-        <p class="settings-subtitle">Редактируйте свой профиль. Всё здесь будет видно другим игрокам.</p>
+        <div class="settings-card">
 
-        <form method="post" enctype="multipart/form-data" class="settings-form">
-            {% csrf_token %}
+            <nav class="settings-nav">
+                <ul class="settings-nav__list">
+                    <li><a href="#profile" class="settings-nav__item is-active" data-section="profile">{% trans "Профиль" %}</a></li>
+                    <li><a href="#appearance" class="settings-nav__item" data-section="appearance">{% trans "Внешний вид" %}</a></li>
+                    <li><a href="#account" class="settings-nav__item" data-section="account">{% trans "Аккаунт" %}</a></li>
+                </ul>
+            </nav>
 
-            <div class="settings-card">
-                <div class="settings-avatar-row">
-                    <div class="settings-avatar">
-                        {% if profile.avatar %}
-                        <img src="{{ profile.avatar.url }}" alt="" width="80" height="80">
-                        {% else %}
-                        <div class="settings-avatar__placeholder">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+            <div class="settings-content">
+
+                {% if messages %}
+                <div class="settings-messages">
+                    {% for message in messages %}
+                    <div class="settings-message settings-message--{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" id="settings-form">
+                    {% csrf_token %}
+
+                    <!-- ===== Profile section ===== -->
+                    <div class="settings-section" id="section-profile">
+                        <div class="settings-content__header">
+                            <h1 class="settings-content__title">{% trans "Публичный профиль" %}</h1>
+                            <p class="settings-content__desc">{% trans "Редактируйте свой профиль. Всё здесь будет видно другим игрокам." %}</p>
                         </div>
-                        {% endif %}
+
+                        <div class="profile-editor-hero">
+                            <div class="profile-editor-avatar">
+                                {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="" class="profile-editor-avatar__img">
+                                {% else %}
+                                <div class="profile-editor-avatar__placeholder">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style="opacity:.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                                </div>
+                                {% endif %}
+                                <label class="profile-editor-avatar__upload-label">
+                                    {% trans "Изменить" %}
+                                    {{ form.avatar }}
+                                </label>
+                            </div>
+
+                            <div class="profile-editor-main">
+                                <div class="profile-editor-identity-preview">
+                                    <span class="profile-editor-name">{{ profile.display_username }}</span>
+                                    {% if profile.country %}
+                                    <img src="https://flagcdn.com/w20/{{ profile.country|lower }}.png" width="16" height="12" alt="" style="border-radius:1px">
+                                    {% endif %}
+                                    {% if profile.flair_emoji %}
+                                    <span class="profile-editor-flair-inline">{{ profile.flair_emoji }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="profile-editor-fields">
+                                    <div class="profile-form__field">
+                                        <label class="profile-form__label">{% trans "Отображаемое имя" %}</label>
+                                        {{ form.display_name }}
+                                    </div>
+
+                                    <div class="profile-form__field">
+                                        <label class="profile-form__label">{% trans "Страна" %}</label>
+                                        {{ form.country }}
+                                    </div>
+
+                                    <div class="profile-form__field">
+                                        <label class="profile-form__label">{% trans "Статус" %}</label>
+                                        {{ form.status }}
+                                    </div>
+
+                                    <div class="profile-form__field">
+                                        <label class="profile-form__label">{% trans "О себе" %}</label>
+                                        {{ form.bio }}
+                                        <span class="profile-form__char-count"><span id="bio-counter">{{ profile.bio|length }}</span>/200</span>
+                                    </div>
+                                </div>
+
+                                {{ form.flair_emoji }}
+
+                                <div class="settings-actions">
+                                    <button type="submit" class="btn-save">{% trans "Сохранить" %}</button>
+                                    <a href="{% url 'profiles:detail' username=request.user.username %}" class="btn-cancel">{% trans "Отмена" %}</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flair-section">
+                            <h3 class="flair-section__title">Flair</h3>
+                            <div class="flair-section__preview">
+                                <span class="flair-section__preview-name">{{ profile.display_username }}</span>
+                                {% if profile.country %}
+                                <img src="https://flagcdn.com/w20/{{ profile.country|lower }}.png" width="16" height="12" alt="" style="border-radius:1px">
+                                {% endif %}
+                                <span class="flair-section__preview-flair" id="flair-preview">{% if profile.flair_emoji %}{{ profile.flair_emoji }}{% endif %}</span>
+                                <button type="button" class="flair-remove" id="flair-remove-btn">{% trans "Убрать flair" %}</button>
+                            </div>
+                            {% for cat_name, cat_items in flair_categories %}
+                            <h4 class="flair-section__category">{{ cat_name }}</h4>
+                            <div class="flair-grid">
+                                {% for emoji in cat_items %}
+                                <button type="button" class="flair-option {% if profile.flair_emoji == emoji %}is-selected{% endif %}" data-value="{{ emoji }}">{{ emoji }}</button>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="settings-avatar-upload">
-                        <label class="btn btn--dark">
-                            Изменить аватар
-                            {{ form.avatar }}
-                        </label>
+
+                    <!-- ===== Appearance section ===== -->
+                    <div class="settings-section" id="section-appearance" style="display:none">
+                        <div class="settings-content__header">
+                            <h1 class="settings-content__title">{% trans "Внешний вид" %}</h1>
+                            <p class="settings-content__desc">{% trans "Настройте интерфейс под себя." %}</p>
+                        </div>
+
+                        <div class="profile-form__field">
+                            <label class="profile-form__label">{% trans "Язык" %}</label>
+                            {{ form.language }}
+                        </div>
+
+                        <div class="profile-form__field">
+                            <label class="profile-form__label">{% trans "Тема доски" %}</label>
+                            <p class="profile-form__hint">{% trans "Тему доски можно изменить прямо на странице игры." %}</p>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save">{% trans "Сохранить" %}</button>
+                            <a href="{% url 'profiles:detail' username=request.user.username %}" class="btn-cancel">{% trans "Отмена" %}</a>
+                        </div>
                     </div>
-                </div>
 
-                <div class="settings-field">
-                    <label class="settings-label">Отображаемое имя</label>
-                    {{ form.display_name }}
-                </div>
+                    <!-- ===== Account section ===== -->
+                    <div class="settings-section" id="section-account" style="display:none">
+                        <div class="settings-content__header">
+                            <h1 class="settings-content__title">{% trans "Аккаунт" %}</h1>
+                            <p class="settings-content__desc">{% trans "Управление аккаунтом." %}</p>
+                        </div>
 
-                <div class="settings-field">
-                    <label class="settings-label">Статус</label>
-                    {{ form.status }}
-                </div>
+                        <div class="account-info">
+                            <div class="account-info__row">
+                                <span class="account-info__label">{% trans "Имя пользователя" %}</span>
+                                <span class="account-info__value">{{ request.user.username }}</span>
+                            </div>
+                            <div class="account-info__row">
+                                <span class="account-info__label">Email</span>
+                                <span class="account-info__value">{{ request.user.email|default:"—" }}</span>
+                            </div>
+                            <div class="account-info__row">
+                                <span class="account-info__label">{% trans "Дата регистрации" %}</span>
+                                <span class="account-info__value">{{ request.user.date_joined|date:"M j, Y" }}</span>
+                            </div>
+                        </div>
 
-                <div class="settings-field">
-                    <label class="settings-label">О себе</label>
-                    {{ form.bio }}
-                </div>
-
-                {{ form.flair_emoji }}
-
-                <div class="settings-field">
-                    <label class="settings-label">Flair</label>
-                    <div class="flair-picker">
-                        {% for value, label in flair_choices %}
-                        <button type="button" class="flair-option {% if profile.flair_emoji == value %}is-active{% endif %}" data-value="{{ value }}">{{ value }}</button>
-                        {% endfor %}
+                        <div class="account-danger">
+                            <a href="{% url 'logout' %}" class="btn-danger">{% trans "Выйти из аккаунта" %}</a>
+                        </div>
                     </div>
-                </div>
+
+                </form>
             </div>
 
-            <div class="settings-actions">
-                <button type="submit" class="btn btn--primary">Сохранить</button>
-                <a href="{% url 'profiles:detail' username=request.user.username %}" class="btn btn--dark">Отмена</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-document.querySelectorAll('.flair-option').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.flair-option').forEach(function(b) { b.classList.remove('is-active'); });
-        btn.classList.add('is-active');
-        document.getElementById('id_flair_emoji').value = btn.getAttribute('data-value');
+(function() {
+    // --- Sections nav ---
+    var navItems = document.querySelectorAll('.settings-nav__item');
+    navItems.forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            navItems.forEach(function(n) { n.classList.remove('is-active'); });
+            item.classList.add('is-active');
+            document.querySelectorAll('.settings-section').forEach(function(s) { s.style.display = 'none'; });
+            var target = item.getAttribute('data-section');
+            document.getElementById('section-' + target).style.display = '';
+        });
     });
-});
+
+    // --- Flair picker ---
+    var flairInput = document.getElementById('id_flair_emoji');
+    var flairPreview = document.getElementById('flair-preview');
+
+    document.querySelectorAll('.flair-option').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.flair-option').forEach(function(b) { b.classList.remove('is-selected'); });
+            btn.classList.add('is-selected');
+            flairInput.value = btn.getAttribute('data-value');
+            flairPreview.textContent = btn.getAttribute('data-value');
+        });
+    });
+
+    document.getElementById('flair-remove-btn').addEventListener('click', function() {
+        document.querySelectorAll('.flair-option').forEach(function(b) { b.classList.remove('is-selected'); });
+        flairInput.value = '';
+        flairPreview.textContent = '';
+    });
+
+    // --- Bio counter ---
+    var bio = document.querySelector('#id_bio, [name="bio"]');
+    var bioCounter = document.getElementById('bio-counter');
+    if (bio && bioCounter) {
+        bio.addEventListener('input', function() {
+            bioCounter.textContent = bio.value.length;
+        });
+    }
+
+    // --- Avatar preview ---
+    var avatarInput = document.querySelector('[name="avatar"]');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+            var img = document.querySelector('.profile-editor-avatar__img');
+            var placeholder = document.querySelector('.profile-editor-avatar__placeholder');
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                if (img) {
+                    img.src = e.target.result;
+                } else if (placeholder) {
+                    var newImg = document.createElement('img');
+                    newImg.src = e.target.result;
+                    newImg.className = 'profile-editor-avatar__img';
+                    placeholder.parentNode.replaceChild(newImg, placeholder);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+})();
 </script>
 {% endblock %}

@@ -2,6 +2,7 @@
     'use strict';
 
     var CSRF = document.querySelector('meta[name="csrf-token"]').content;
+    var T = window.MS_I18N || {};
 
     var board = document.getElementById('board');
     var boardUnit = document.getElementById('board-unit');
@@ -11,18 +12,38 @@
     var bannerText = document.getElementById('banner-text');
     var panelStatus = document.getElementById('panel-status');
     var diffCurrentLabel = document.getElementById('diff-current-label');
+    var modeBadge = document.getElementById('mode-badge');
+    var dailyInfo = document.getElementById('daily-info');
+    var dailyTitle = document.getElementById('daily-title');
+    var dailyDesc = document.getElementById('daily-desc');
 
     var gameState = null;
     var timerInterval = null;
     var localTime = 0;
     var currentDifficulty = 'beginner';
+    var currentMode = 'classic';
     var currentTheme = localStorage.getItem('ms-theme') || 'classic';
+    var blindTimers = [];
 
     var diffLabels = {
-        beginner: 'Новичок',
-        intermediate: 'Любитель',
-        expert: 'Эксперт',
-        custom: 'Своя игра'
+        beginner: T.beginner || 'Beginner',
+        intermediate: T.intermediate || 'Intermediate',
+        expert: T.expert || 'Expert',
+        custom: T.custom || 'Custom'
+    };
+
+    var modeLabels = {
+        classic: T.modeClassic || 'Classic',
+        speed: T.modeSpeed || 'Speed Run',
+        noflag: T.modeNoflag || 'No Flags',
+        daily: T.modeDaily || 'Daily Challenge',
+        blind: T.modeBlind || 'Blind Mode',
+        infinite: T.modeInfinite || 'Infinite'
+    };
+
+    var modeIcons = {
+        classic: '💣', speed: '⚡', noflag: '🚫',
+        daily: '📅', blind: '🙈', infinite: '♾️'
     };
 
     function api(url, data) {
@@ -62,11 +83,15 @@
         }
     }
 
+    function clearBlindTimers() {
+        blindTimers.forEach(function (t) { clearTimeout(t); });
+        blindTimers = [];
+    }
+
     function isDark(r, c) {
         return (r + c) % 2 === 1;
     }
 
-    // вычисляет макс. размер клетки чтобы доска влезла на экран
     function calcCellSize(rows, cols) {
         var sidebar = window.innerWidth > 900 ? 220 : 0;
         var sidePanel = window.innerWidth > 900 ? 280 : 0;
@@ -93,38 +118,68 @@
         board.style.fontSize = Math.max(10, Math.round(size * 0.38)) + 'px';
     }
 
+    function updateModeBadge() {
+        if (modeBadge) {
+            if (currentMode === 'classic') {
+                modeBadge.style.display = 'none';
+            } else {
+                modeBadge.style.display = '';
+                modeBadge.textContent = (modeIcons[currentMode] || '') + ' ' + (modeLabels[currentMode] || currentMode);
+            }
+        }
+    }
+
+    function updateDailyInfo(state) {
+        if (!dailyInfo) return;
+        if (state.mode === 'daily' && state.daily) {
+            dailyInfo.style.display = '';
+            dailyTitle.textContent = (T.dailyTitle || 'Daily Challenge') + ' #' + state.daily.day_number;
+            dailyDesc.textContent = T.dailyDesc || 'All players get the same board. Show your best time!';
+        } else {
+            dailyInfo.style.display = 'none';
+        }
+    }
+
     function render(state) {
         gameState = state;
+        currentMode = state.mode || 'classic';
 
         applyCellSize(state.rows, state.cols);
         board.style.gridTemplateColumns = 'repeat(' + state.cols + ', var(--cell-size))';
         board.style.gridTemplateRows = 'repeat(' + state.rows + ', var(--cell-size))';
         board.innerHTML = '';
 
+        clearBlindTimers();
+
         minesLeft.textContent = state.mines - state.flags_count;
 
         boardUnit.classList.remove('game-won', 'game-lost');
         gameBanner.className = 'game-banner hidden';
 
+        updateModeBadge();
+        updateDailyInfo(state);
+
         if (state.status === 'won') {
             boardUnit.classList.add('game-won');
             gameBanner.className = 'game-banner won';
-            bannerText.textContent = 'Победа! Время: ' + state.elapsed.toFixed(1) + 's';
-            panelStatus.textContent = 'Вы победили!';
+            bannerText.textContent = (T.winBanner || 'Victory! Time:') + ' ' + state.elapsed.toFixed(1) + 's';
+            panelStatus.textContent = T.won || 'You won!';
             stopTimer();
             timerEl.textContent = padTimer(Math.floor(state.elapsed));
         } else if (state.status === 'lost') {
             boardUnit.classList.add('game-lost');
             gameBanner.className = 'game-banner lost';
-            bannerText.textContent = 'Игра окончена — мина!';
-            panelStatus.textContent = 'Игра проиграна';
+            bannerText.textContent = T.lossBanner || 'Game over — mine!';
+            panelStatus.textContent = T.lost || 'Game lost';
             stopTimer();
             timerEl.textContent = padTimer(Math.floor(state.elapsed));
         } else if (state.status === 'playing') {
-            panelStatus.textContent = 'Игра идёт...';
+            panelStatus.textContent = T.playing || 'Playing...';
         } else {
-            panelStatus.textContent = 'Готов к игре';
+            panelStatus.textContent = T.ready || 'Ready';
         }
+
+        var newlyRevealed = [];
 
         for (var r = 0; r < state.rows; r++) {
             for (var c = 0; c < state.cols; c++) {
@@ -139,13 +194,16 @@
                 if (cellData.revealed) {
                     if (cellData.mine) {
                         el.classList.add('cell-mine');
-                        el.textContent = '💣';
+                        el.textContent = '\uD83D\uDCA3';
                     } else {
                         el.classList.add('cell-revealed');
                         if (dark) el.classList.add('cell-dark');
                         if (cellData.value > 0) {
                             el.textContent = cellData.value;
                             el.setAttribute('data-value', cellData.value);
+                            if (currentMode === 'blind' && state.status === 'playing') {
+                                newlyRevealed.push(el);
+                            }
                         }
                     }
                 } else if (cellData.flagged) {
@@ -160,6 +218,20 @@
                 board.appendChild(el);
             }
         }
+
+        if (currentMode === 'blind' && state.status === 'playing') {
+            scheduleBlindFade();
+        }
+    }
+
+    function scheduleBlindFade() {
+        var tid = setTimeout(function () {
+            var cells = board.querySelectorAll('.cell-revealed[data-value]');
+            cells.forEach(function (c) {
+                c.classList.add('cell-blind-fade');
+            });
+        }, 2000);
+        blindTimers.push(tid);
     }
 
     board.addEventListener('click', function (e) {
@@ -186,6 +258,8 @@
         if (!cell) return;
         if (!gameState || gameState.status === 'won' || gameState.status === 'lost') return;
 
+        if (currentMode === 'noflag') return;
+
         var row = parseInt(cell.getAttribute('data-row'));
         var col = parseInt(cell.getAttribute('data-col'));
 
@@ -196,7 +270,6 @@
         });
     });
 
-    // средняя кнопка мыши — chord (раскрыть соседей)
     board.addEventListener('auxclick', function (e) {
         if (e.button !== 1) return;
         e.preventDefault();
@@ -215,14 +288,17 @@
         });
     });
 
-    function newGame(difficulty, rows, cols, mines) {
+    function newGame(difficulty, rows, cols, mines, mode) {
         stopTimer();
+        clearBlindTimers();
         localTime = 0;
         timerEl.textContent = '000';
         currentDifficulty = difficulty;
-        diffCurrentLabel.textContent = diffLabels[difficulty] || 'Своя игра';
+        currentMode = mode || 'classic';
+        diffCurrentLabel.textContent = diffLabels[difficulty] || diffLabels.custom;
+        updateModeBadge();
 
-        var payload = { difficulty: difficulty };
+        var payload = { difficulty: difficulty, mode: currentMode };
         if (rows) payload.rows = rows;
         if (cols) payload.cols = cols;
         if (mines) payload.mines = mines;
@@ -231,11 +307,11 @@
     }
 
     document.getElementById('btn-restart').addEventListener('click', function () {
-        newGame(currentDifficulty);
+        newGame(currentDifficulty, null, null, null, currentMode);
     });
 
     document.getElementById('banner-new-game').addEventListener('click', function () {
-        newGame(currentDifficulty);
+        newGame(currentDifficulty, null, null, null, currentMode);
     });
 
     var dropdownBtn = document.getElementById('diff-dropdown-btn');
@@ -246,7 +322,6 @@
         dropdownMenu.classList.toggle('open');
     });
 
-    // закрыть дропдаун при клике куда угодно
     document.addEventListener('click', function () {
         dropdownMenu.classList.remove('open');
     });
@@ -261,7 +336,7 @@
             if (diff === 'custom') {
                 showModal('custom-modal');
             } else {
-                newGame(diff);
+                newGame(diff, null, null, null, currentMode);
             }
         });
     });
@@ -296,7 +371,7 @@
         var cols = parseInt(document.getElementById('custom-cols').value) || 16;
         var mines = parseInt(document.getElementById('custom-mines').value) || 40;
         hideModal('custom-modal');
-        newGame('custom', rows, cols, mines);
+        newGame('custom', rows, cols, mines, currentMode);
     });
 
     document.getElementById('custom-cancel').addEventListener('click', function () {
@@ -309,7 +384,7 @@
     }
 
     document.getElementById('win-save').addEventListener('click', function () {
-        var name = document.getElementById('win-name').value.trim() || 'Аноним';
+        var name = document.getElementById('win-name').value.trim() || (T.anonymous || 'Anonymous');
         api('/play/api/save/', { name: name }).then(function () {
             hideModal('win-modal');
         });
@@ -341,5 +416,12 @@
         }, 100);
     });
 
-    newGame('beginner');
+    // Read mode from URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var initMode = urlParams.get('mode') || 'classic';
+    if (['classic', 'speed', 'noflag', 'daily', 'blind', 'infinite'].indexOf(initMode) === -1) {
+        initMode = 'classic';
+    }
+
+    newGame('beginner', null, null, null, initMode);
 })();

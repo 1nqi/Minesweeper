@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_protect
 
@@ -24,7 +25,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Аккаунт создан. Добро пожаловать!')
+            messages.success(request, _('Аккаунт создан. Добро пожаловать!'))
             return redirect('game:index')
     else:
         form = SignupForm()
@@ -45,7 +46,6 @@ def login_view(request):
             password = form.cleaned_data['password']
             remember_me = form.cleaned_data.get('remember_me', True)
 
-            # пробуем найти юзера по email, если ввели @
             user = None
             if '@' in login_value:
                 user = User.objects.filter(email__iexact=login_value).first()
@@ -58,13 +58,13 @@ def login_view(request):
                 login(request, user)
                 if not remember_me:
                     request.session.set_expiry(0)
-                messages.success(request, 'Вы вошли в аккаунт.')
+                messages.success(request, _('Вы вошли в аккаунт.'))
                 next_url = request.POST.get('next') or request.GET.get('next') or '/'
                 return redirect(next_url)
             else:
-                messages.error(request, 'Неверное имя пользователя или пароль.')
+                messages.error(request, _('Неверное имя пользователя или пароль.'))
         else:
-            messages.error(request, 'Исправьте ошибки ниже.')
+            messages.error(request, _('Исправьте ошибки ниже.'))
     else:
         form = LoginForm()
 
@@ -75,5 +75,9 @@ def login_view(request):
 @require_http_methods(['GET', 'POST'])
 def logout_view(request):
     logout(request)
-    messages.success(request, 'Вы вышли из аккаунта.')
+    messages.success(request, _('Вы вышли из аккаунта.'))
     return redirect('home')
+
+
+def google_login(request):
+    return redirect('/accounts/google/login/')
